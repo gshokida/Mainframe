@@ -1,0 +1,12 @@
+SALUDO   SUBENTRY BASES=(3)
+         WTOR  'Cual es tu  nombre?',NOM,,WAITECB
+         WAIT  ECB=WAITECB
+         MVC   HOLANOM+5(15),NOM
+         WTO   MF=(E,HOLANOM-4)
+         SUBEXIT
+NOM      DC    CL15'               '
+WAITECB  DC    F'0'
+         DC    H'24'
+         DC    H'0'
+HOLANOM  DC    CL20'Hola' Completa con blancos hasta 20 bytes
+         END
