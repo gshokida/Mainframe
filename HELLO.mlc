@@ -1,0 +1,4 @@
+HELLO     SUBENTRY
+          WTO   'HELLO WORLD'
+          SUBEXIT
+          END
