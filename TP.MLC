@@ -1,0 +1,23 @@
+TP       SUBENTRY BASES=(3)
+         WTOR  'Ingrese la cantidad de estaciones?',CANT,,WAITECB
+         WAIT  ECB=WAITECB
+         WTO   'Hola'
+         MVC   MSG,CANT
+         WTO   MF=(E,MSG-4)
+         MVC   MSG,=C'99'
+         WTO   MF=(E,WTOBLOCK)
+         WTO   MF=(E,CANT-4)
+         WTO   'Chau'
+         SUBEXIT
+
+
+         DC    H'6'
+         DC    H'0'
+CANT     DC    CL2'  '
+
+WAITECB  DC    F'0'
+WTOBLOCK DC    H'6'
+         DC    H'0'
+MSG      DS    CL2
+
+         END
