@@ -1,0 +1,66 @@
+EJMENU   SUBENTRY BASES=(3)         
+         WTO   '=========>    INICIO    <========='         
+         
+		 BAL   5,INICIAR
+MENU	 BAL   5,IMPRME_M
+         WTOR  'SELECCIONAR OPCION [1-3]',OPCION,,WAITECB
+		 WAIT  ECB=WAITECB 
+         CLC   OPCION,=C'1'
+		 BE    TRAMO
+		 CLC   OPCION,=C'2'
+		 BE    LINEAS
+		 CLC   OPCION,=C'3'
+		 BE    FIN
+		 
+FIN      WTO   '=========>    FIN    <========='  
+         SUBEXIT
+
+
+************************************
+*******         MENU         *******
+************************************
+IMPRME_M WTO   '---------------------------------'
+         WTO   '---------      MENU     ---------'
+         WTO   '---------------------------------'
+         WTO   '1) INGRESAR TRAMO'
+         WTO   '2) VER LINEAS'		 
+         WTO   '3) SALIR'		 
+		 BR    5
+
+
+*************************************
+*******   INICIAR VARIABLES   *******
+*************************************
+INICIAR  LA    6,MAT
+         LA    9,20
+INITMAT  MVC   0(3,6),=X'00000F'
+         LA    6,3(6)
+         BCT   9,INITMAT		 
+         BR    5
+
+
+*******************************************
+*******       INGRESAR TRAMOS       *******
+*******************************************
+TRAMO    WTO   'INGRESO TRAMO'
+         B     MENU
+
+
+******************************************
+*******       MUESTRO LINEAS       *******
+******************************************
+LINEAS   WTO   'MUESTRO LINEAS'
+         B     MENU
+
+********************************************
+*******   DECLARACION DE VARIABLES   *******
+********************************************
+OPCION   DS    CL1
+ORDEN    DS    CL1
+
+WAITECB  DC    F'0'
+
+WTOBLOCK DC    H'12'
+		 DC    H'0'
+
+MAT      DS    20PL3
