@@ -64,3 +64,4 @@ WTOBLOCK DC    H'12'
 		 DC    H'0'
 
 MAT      DS    20PL3
+         END
