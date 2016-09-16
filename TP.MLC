@@ -1,16 +1,69 @@
+**********************************************************************
+*INICIO
+**********************************************************************
 TP       SUBENTRY BASES=(3)
-         WTOR  'Ingrese la cantidad de estaciones?',CANT,,WAITECB
-         WAIT  ECB=WAITECB
-         WTO   'Hola'
-         MVC   MSG,CANT
-         WTO   MF=(E,MSG-4)
-         MVC   MSG,=C'99'
-         WTO   MF=(E,WTOBLOCK)
-         WTO   MF=(E,CANT-4)
-         WTO   'Chau'
+         BAL   5,INICIAR
+         BAL   5,CANTEST *INGRESAR CANTIDAD ESTACIONES
+MENU	 BAL   5,IMPRME_M
+         WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
+		 WAIT  ECB=WAITECB 
+         CLC   OPCION,=C'1'
+		 BE    TRAMO *INGRESAR TRAMO
+		 CLC   OPCION,=C'2'
+		 BE    LINEAS *VER LINEAS
+		 CLC   OPCION,=C'3'
+		 BE    VEREST *VER ESTACIONES
+		 CLC   OPCION,=C'4'
+		 BE    FIN
+		 
+FIN      WTO   '=========>    FIN    <========='  
          SUBEXIT
 
 
+**********************************************************************
+*INICIAR VARIABLES
+**********************************************************************
+INICIAR  BR    5
+
+**********************************************************************
+*MENU
+**********************************************************************
+IMPRME_M WTO   '--------------      MENU     --------------'
+         WTO   '1) INGRESAR TRAMO'
+         WTO   '2) VER LINEAS'
+         WTO   '3) VER CANTIDAD DE ESTACIONES'		 
+         WTO   '4) SALIR'
+         WTO   '-------------------------------------------'
+		 BR    5
+
+**********************************************************************
+*CANTIDAD DE ESTACIONES
+**********************************************************************
+CANTEST  WTOR  'Ingrese la cantidad de estaciones?',CANT,,WAITECB
+         WAIT  ECB=WAITECB
+         BR    5
+
+**********************************************************************
+*INGRESAR TRAMOS
+**********************************************************************
+TRAMO    WTO   'INGRESO TRAMO'
+         B     MENU
+
+**********************************************************************
+* MUESTRO LINEAS   
+**********************************************************************
+LINEAS   WTO   'MUESTRO LINEAS'
+         B     MENU
+
+**********************************************************************
+* MUESTRO CANTIDAD DE ESTACIONES   
+**********************************************************************
+VEREST   WTO   MF=(E,CANT-4)
+         B     MENU
+
+**********************************************************************
+*DEFINICION DE VARIABLES
+**********************************************************************
          DC    H'6'
          DC    H'0'
 CANT     DC    CL2'  '
@@ -18,6 +71,7 @@ CANT     DC    CL2'  '
 WAITECB  DC    F'0'
 WTOBLOCK DC    H'6'
          DC    H'0'
-MSG      DS    CL2
+
+OPCION   DS    CL1
 
          END
