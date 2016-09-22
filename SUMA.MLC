@@ -1,0 +1,22 @@
+SUMA     SUBENTRY BASES=(3)
+INICIO   WTOR  'INGRESAR PRIMER NUMERO',NUM,,WAITECB
+         WAIT  ECB=WAITECB
+         MVC   NUMUNO(3),NUM
+         WTOR  'INGRESAR SEGUNDO NUMERO',NUM,,WAITECB
+         WAIT  ECB=WAITECB
+         MVC   NUMDOS(3),NUM
+         WTO   'IMPRIMO VALORES'
+         WTO   MF=(E,NUMUNO)
+         WTO   MF=(E,NUMDOS)
+         SUBEXIT
+
+WAITECB  DC    F'0'
+WTOBLOCK DC    H'24'
+         DC    H'0'
+
+NUM      DC    CL3'   '
+
+NUMUNO   DC    CL3'111'
+
+NUMDOS   DC    CL3'222'
+         END

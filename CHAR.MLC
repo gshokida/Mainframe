@@ -1,0 +1,19 @@
+CHAR     SUBENTRY BASES=(3)
+INICIO   LA    4,CADENA
+         LA    5,RES
+NEXT     CLC   0(1,4),=C'*'
+         BE    FIN
+         MVC   0(1,5),0(4)
+         LA    4,1(4)
+         LA    5,2(5)
+         B     NEXT
+         MVI   0(5),C'#'
+         WTO   MF=(E,CADENA)
+         WTO   MF=(E,RES)
+FIN      WTO   'FIN'
+         SUBEXIT
+         
+CADENA   DC    C'HOLAHOLA*'
+RES      DC    C'                    '
+
+         END
