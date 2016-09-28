@@ -3,7 +3,7 @@ EJCL2    SUBENTRY BASES=(3)
          LA    5,EMPAP
          LA    6,EMPAN
          ZAP   TOTAL,=P'0'
-OTRO     CLI   0(4),X'FF'
+OTRO     CLI   0(4),C'FF'
          BC    8,FIN *BE FIN
          AP    TOTAL,=P'1'
          CP    0(4,4),=P'0'
@@ -24,7 +24,7 @@ FIN      MVC   0(1,6),=C'N'
          UNPK  PORCNC,CANTN(4)
          MVZ   PORCNC+6(1),=X'FF'
          SUBEXIT
-EMPAS    DC    XL18'123A123B123C123DFF'
+EMPAS    DC    CL18'123A123B123C123DFF'
 EMPAN    DS    PL18
 EMPAP    DS    PL18
 TOTAL    DS    PL3
