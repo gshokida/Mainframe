@@ -1,0 +1,33 @@
+EJCL2    SUBENTRY BASES=(3)
+         LA    4,EMPAS
+         LA    5,EMPAP
+         LA    6,EMPAN
+         ZAP   TOTAL,=P'0'
+OTRO     CLI   0(4),X'FF'
+         BC    8,FIN *BE FIN
+         AP    TOTAL,=P'1'
+         CP    0(4,4),=P'0'
+         BC    4,NEG *BL NEG
+         MVC   0(4,5),0(4)
+         A     5,=F'4' * LA  5,4(5)
+         A     4,=F'4'
+         BC    15,OTRO
+NEG      ZAP   0(4,6), 0(4,4)
+         LA    6,4(6)
+         LA    4,4(4)
+         AP    CANTN,=P'1'
+         B     OTRO
+FIN      MVC   0(1,6),=C'N'
+         MVI   0(5),C'P'
+         MP    CANTN,=P'100'
+         DP    CANTN,TOTAL
+         UNPK  PORCNC,CANTN(4)
+         MVZ   PORCNC+6(1),=X'FF'
+         SUBEXIT
+EMPAS    DC    XL18'123A123B123C123DFF'
+EMPAN    DS    PL18
+EMPAP    DS    PL18
+TOTAL    DS    PL3
+CANTN    DC    PL7'0'
+PORCNC   DS    PL7
+         END

@@ -11,9 +11,9 @@ INICIO   WTOR  'INGRESAR PRIMER NUMERO',NUM,,WAITECB
          SUBEXIT
 
 WAITECB  DC    F'0'
-WTOBLOCK DC    H'24'
+WTOBLOCK DC    H'7'
          DC    H'0'
-
+MSG      DS    CL3
 NUM      DC    CL3'   '
 
 NUMUNO   DC    CL3'111'
