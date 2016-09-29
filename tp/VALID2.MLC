@@ -1,0 +1,32 @@
+*VALIDAR NUMERO INGRESADO
+VALID    SUBENTRY BASES=(3)
+MENU     WTOR  'INGRESE UN NUMERO ENTRE 1 Y 9, F SALIR',NUM,,WAITECB
+         WAIT  ECB=WAITECB
+         CLC   NUM,=C'F'
+         BE    FIN
+         BAL   5,VALIDAR
+         B     MENU
+FIN      WTO   '------FIN------'
+
+         SUBEXIT
+         
+VALIDAR  CLC   NUM,=C'1'
+         BL    MENOR
+         CLC   NUM,=C'9'
+         BH    MAYOR
+         WTO   'OK'
+         WTO   MF=(E,NUM-4)
+VALBK    BR    5
+         
+MENOR    WTO   'ES MENOR QUE 1'
+         B     VALBK
+         
+MAYOR    WTO   'ES MAYOR QUE 9'
+         B     VALBK
+         
+WAITECB  DC    F'0'
+
+         DC    H'5'
+         DC    H'0'
+NUM      DS    CL1
+         END
