@@ -3,6 +3,7 @@ EJMENU   SUBENTRY BASES=(3)
          
 		 BAL   5,INICIAR
 MENU	 BAL   5,IMPRME_M
+
          WTOR  'SELECCIONAR OPCION [1-3]',OPCION,,WAITECB
 		 WAIT  ECB=WAITECB 
          CLC   OPCION,=C'1'
@@ -11,6 +12,9 @@ MENU	 BAL   5,IMPRME_M
 		 BE    LINEAS
 		 CLC   OPCION,=C'3'
 		 BE    FIN
+		 
+		 WTO   'OPCION NO VALIDA'
+		 B     MENU
 		 
 FIN      WTO   '=========>    FIN    <========='  
          SUBEXIT
