@@ -1,0 +1,17 @@
+*REALIZAR UNA MULTIPLICACION CON EMPAQUETADOS
+MULTPK   SUBENTRY BASES=(3)
+         LA    5,EMPA2
+         LA    6,0
+         LA    7,EMPA1
+         MR    6,5
+         CP    0(4,7),RES1
+         BE    IGUAL1
+         WTO   'SON DISTINTOS'
+         B     FIN
+IGUAL1   WTO   'SON IGUALES =)'
+FIN      WTO   'FIN'
+         SUBEXIT
+EMPA1    DC    PL3'15'
+EMPA2    DC    PL2'3'
+RES1     DC    PL2'45'
+         END

@@ -1,0 +1,18 @@
+NUMCHK   SUBENTRY BASES=(3)
+INICIO   WTOR  'INGRESAR EL NUMERO 1',NUM1,,WAITECB
+         WAIT  ECB=WAITECB
+         WTO   'PRIMER NUMERO'
+         WTO   MF=(E,NUM1-4)
+*SUMO LOS EMPAQUETADOS
+         CLC   VAL1,NUM1
+*         UNPK  RESULT,EMPA1
+*         WTO   MF=(E,RESULT-4)
+FIN      WTO   'FIN'
+         SUBEXIT
+
+WAITECB  DC    F'0'
+WTOBLOCK DC    H'7'
+         DC    H'0'
+NUM1     DS    CL1
+VAL1     DC    CL1'1'
+         END

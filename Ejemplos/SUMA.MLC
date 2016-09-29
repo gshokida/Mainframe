@@ -1,30 +1,40 @@
 *INGRESO DOS NUMEROS CONVIERTO A PACKAGE Y ME FIJO SI LA SUMA
 *DA 10
 SUMA     SUBENTRY BASES=(3)
-INICIO   WTOR  'INGRESAR PRIMER NUMERO',NUM,,WAITECB
+INICIO   WTOR  'INGRESAR PRIMER NUMERO',NUM1,,WAITECB
          WAIT  ECB=WAITECB
-         MVC   NUMUNO(3),NUM
-         WTOR  'INGRESAR SEGUNDO NUMERO',NUM,,WAITECB
+         WTOR  'INGRESAR SEGUNDO NUMERO',NUM2,,WAITECB
          WAIT  ECB=WAITECB
-         MVC   NUMDOS(3),NUM
-         PACK  EMPA1,NUMUNO
-         PACK  EMPA2,NUMDOS
-         AP    EMPA1,EMPA2
-         CP    EMPA1,=P'10'
-         BE    IGUAL
-         WTO   'LA SUMA NO DA 10'
-         B     FIN
-IGUAL    WTO   'LA SUMA DA 10 =)'
+         WTO   'PRIMER NUMERO'
+         WTO   MF=(E,NUM1-4)
+         WTO   'SEGUNDO NUMERO'
+         WTO   MF=(E,NUM2-4)
+*CONVIERTO LOS INGRESOS A EMPAQUETADO
+         PACK  EMPA1,NUM1
+         PACK  EMPA2,NUM2
+*SUMO LOS EMPAQUETADOS
+         ZAP   TOTAL,EMPA1
+         AP    TOTAL,EMPA2
+         UNPK  RESULT,TOTAL
+         MVZ   RESULT+7(1),=X'FF'
+         WTO   MF=(E,RESULT-4)
 FIN      WTO   'FIN'
          SUBEXIT
 
 WAITECB  DC    F'0'
 WTOBLOCK DC    H'7'
          DC    H'0'
-MSG      DS    CL3
-NUM      DC    CL3'   '
-NUMUNO   DC    CL3'111'
-NUMDOS   DC    CL3'222'
-EMPA1    DS    PL3
-EMPA2    DS    PL3
+NUM1     DS    CL3
+         
+         DC    H'7'
+         DC    H'0'
+NUM2     DS    CL3
+
+TOTAL    DS    PL7
+EMPA1    DS    PL6
+EMPA2    DS    PL6
+         
+         DC    H'12'
+         DC    H'0'
+RESULT   DS    CL8
          END
