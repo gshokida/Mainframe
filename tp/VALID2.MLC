@@ -1,32 +1,86 @@
-*VALIDAR NUMERO INGRESADO
+***********************************************************************
+***********************************************************************
+*        VALIDAR NUMERO INGRESADO
+***********************************************************************
+***********************************************************************  
 VALID    SUBENTRY BASES=(3)
-MENU     WTOR  'INGRESE UN NUMERO ENTRE 1 Y 9, F SALIR',NUM,,WAITECB
+INICIAR  BAL   5,INITVAR
+MENU     WTO   'INGRESE UN NUMERO ENTRE 1 Y 20'
+         WTOR  'FF PARA SALIR',CANTEST,,WAITECB
          WAIT  ECB=WAITECB
-         CLC   NUM,=C'F'
+         CLC   CANTEST,=C'FF'
          BE    FIN
-         BAL   5,VALIDAR
+         BAL   5,VALEST *VERIFICO SI LOS DOS CHAR SON NUMEROS
+         BAL   5,RANGO *VALOR EN RANGO
          B     MENU
 FIN      WTO   '------FIN------'
 
          SUBEXIT
+
+***********************************************************************
+***********************************************************************
+*        INICIALIZAR LAS VARIABLES
+***********************************************************************
+*********************************************************************** 
+
+INITVAR  ZAP   MAXEST,=P'20'
+         ZAP   MINEST,=P'1'
+         BR    5
          
-VALIDAR  CLC   NUM,=C'1'
-         BL    MENOR
-         CLC   NUM,=C'9'
-         BH    MAYOR
-         WTO   'OK'
-         WTO   MF=(E,NUM-4)
+***********************************************************************
+***********************************************************************
+*VALIDO SI LOS DOS DIGITOS INGRESADOS SON NUMERICOS
+*SI INREGOS UN SOLO NUMERO LO CONVIERTE EN 0 MAS EL DIGITO
+*CASO CONTRARIO MUESTRA UN NUMERO NO VALIDO
+***********************************************************************
+***********************************************************************  
+
+VALEST   LA    4,CANTEST
+         CLC   0(1,4),=C'0'
+         BL    NVALID1
+         CLC   0(1,4),=C'9'
+         BH    NVALID1
+         CLC   1(1,4),=C'0'
+         BL    NVALID2
+         CLC   1(1,4),=C'9'
+         BH    NVALID2
+DOPAK    PACK  ESTPAK,0(2,4)
 VALBK    BR    5
          
-MENOR    WTO   'ES MENOR QUE 1'
-         B     VALBK
+NVALID1  WTO   'NUMERO NO VALIDO'
+         B     MENU
+NVALID2  MVC   1(1,4),0(4)
+         MVI   0(4),C'0'
+         B     DOPAK
+
+***********************************************************************
+***********************************************************************
+*        VERIFICO SI EL RANGO ES EL CORRECTO
+***********************************************************************
+***********************************************************************  
+
+RANGO    CP    ESTPAK,MAXEST
+         BH    NRANGO
+         CP    ESTPAK,MINEST
+         BL    NRANGO
+         BR    5
+
+NRANGO   WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
+         B     MENU
          
-MAYOR    WTO   'ES MAYOR QUE 9'
-         B     VALBK
-         
+***********************************************************************
+***********************************************************************
+*        VARIABLES
+***********************************************************************
+***********************************************************************
+
 WAITECB  DC    F'0'
 
-         DC    H'5'
+         DC    H'6'
          DC    H'0'
-NUM      DS    CL1
+CANTEST  DS    CL2
+ESTPAK   DS    PL2
+
+MAXEST   DS    PL2
+MINEST   DS    PL2
          END
