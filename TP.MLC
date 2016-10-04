@@ -26,7 +26,9 @@ FIN      WTO   '=========>    FIN    <========='
 **********************************************************************
 *INICIAR VARIABLES
 **********************************************************************
-INICIAR  BR    5
+INICIAR  ZAP   MAXEST,=P'20'
+         ZAP   MINEST,=P'1'
+         BR    5
 
 **********************************************************************
 *MENU
@@ -44,7 +46,30 @@ PRINT_M  WTO   '--------------      MENU     --------------'
 **********************************************************************
 CANTEST  WTOR  'Ingrese la cantidad de estaciones?',CANT,,WAITECB
          WAIT  ECB=WAITECB
+         BAL   6,VALEST
          BR    5
+
+**********************************************************************
+* VALIDO CANTIDAD DE ESTACIONES
+**********************************************************************
+VALEST   LA    7,CANT
+         CLC   0(1,7),=C'0'
+         BL    NVALID1
+         CLC   0(1,7),=C'9'
+         BH    NVALID1
+         CLC   1(1,7),=C'0'
+         BL    NVALID2
+         CLC   1(1,7),=C'9'
+         BH    NVALID2
+DOPAK    PACK  CANTPAK,0(2,7)
+VALBK    BR    6
+         
+NVALID1  WTO   'NUMERO NO VALIDO'
+         B     CANTEST
+NVALID2  MVC   1(1,7),0(7)
+         MVI   0(7),C'0'
+         B     DOPAK
+
 
 **********************************************************************
 *INGRESAR TRAMOS
@@ -61,15 +86,24 @@ LINEAS   WTO   'MUESTRO LINEAS'
 **********************************************************************
 * MUESTRO CANTIDAD DE ESTACIONES   
 **********************************************************************
-VEREST   WTO   MF=(E,CANT-4)
+VEREST   MVC   TOTESTA+21(2),CANT
+         WTO   MF=(E,TOTESTA-4)
          B     MENU
 
 **********************************************************************
 *DEFINICION DE VARIABLES
 **********************************************************************
-         DC    H'6'
+
+MAXEST   DS    PL2
+MINEST   DS    PL2
+
+CANT     DS    CL2
+
+CANTPAK  DS    PL2
+
+         DC    H'29'
          DC    H'0'
-CANT     DC    CL2'  '
+TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
 
 WAITECB  DC    F'0'
 WTOBLOCK DC    H'6'
