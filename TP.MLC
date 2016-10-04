@@ -28,6 +28,19 @@ FIN      WTO   '=========>    FIN    <========='
 **********************************************************************
 INICIAR  ZAP   MAXEST,=P'20'
          ZAP   MINEST,=P'1'
+* CARGO LA MATRIZ DE NUMERO DE LINEA
+         LA    7,V_NUMLIN 
+         LA    8,20
+V_NL     ZAP   0(2,7),=P'0'
+         LA    7,2(7)
+         BCT   9,V_NL
+* CARGO LA MATRIZ DE VISTA
+         LA    7,V_VISTO
+         LA    8,20
+V_VIS    ZAP   0(1,7),=P'0'
+         LA    7,1(7)
+         BCT   9,V_VIS
+                  
          BR    5
 
 **********************************************************************
@@ -70,7 +83,6 @@ NVALID2  MVC   1(1,7),0(7)
          MVI   0(7),C'0'
          B     DOPAK
 
-
 **********************************************************************
 *INGRESAR TRAMOS
 **********************************************************************
@@ -93,22 +105,36 @@ VEREST   MVC   TOTESTA+21(2),CANT
 **********************************************************************
 *DEFINICION DE VARIABLES
 **********************************************************************
-
+* MAXIMO Y MINIMO DE LAS ESTACIONES
 MAXEST   DS    PL2
 MINEST   DS    PL2
 
+*CANTIDAD DE ESTACIONES EN CHAR
 CANT     DS    CL2
 
+*CANTIDAD DE ESTACIONES EN EMPAQUETADO
 CANTPAK  DS    PL2
 
+*PARA IMPRIMIR EL TOTAL DE ESTACIONES
          DC    H'29'
          DC    H'0'
 TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
 
+*PARA EL WTOR
 WAITECB  DC    F'0'
 WTOBLOCK DC    H'6'
          DC    H'0'
 
+*PARA LAS OPCIONES DEL MENU
 OPCION   DS    CL1
+
+*VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
+V_NUMLIN DS    20PL2
+
+*VECTOR DONDE GUARDO SI PASE POR ESA LINEA
+V_VISTO  DS    20PL1
+
+*MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
+MAT      DS    400PL1
 
          END
