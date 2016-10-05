@@ -1,0 +1,93 @@
+**********************************************************************
+* PRUEBA PARA AGREGAR LOS TRAMOS A LA MATRIZ
+**********************************************************************
+TRAMO    SUBENTRY BASES=(3)
+         BAL   5,INIT_MAT
+MENU     BAL   5,S_MENU
+         WTOR  'INGRESE UNA OPCION [1-3]',OPCION,,WAITECB
+         WAIT  ECB=WAITECB
+         CLI   OPCION,C'1'
+         BE    ADD_TRAM
+         CLI   OPCION,C'2'
+         BE    VER_MAT
+         CLI   OPCION,C'3'
+         BE    FIN
+         B     MENU
+FIN      WTO   'FIN'
+     
+         SUBEXIT
+
+**********************************************************************
+* INCIALIZO LA MATRIZ
+**********************************************************************
+INIT_MAT LA    6,25
+         LA    7,MAT
+CICLO    ZAP   0(1,7),=P'0'
+         LA    7,1(7)
+         BCT   6,CICLO
+         BR    5
+
+**********************************************************************
+* PIDO EL INICIO Y FIN DEL TRAMO
+**********************************************************************
+ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
+         WAIT  ECB=WAITECB
+         WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
+         WAIT  ECB=WAITECB
+         PACK  VAL_X_P,VAL_X
+         PACK  VAL_Y_P,VAL_Y
+         CVB   9,VAL_X_P
+         CVB   9,VAL_Y_P
+         WTO   'OK'
+         B     MENU
+
+**********************************************************************
+* MUESTRO LA MATRIZ
+**********************************************************************
+VER_MAT  WTO   '-------------------------------------------'
+         LA    6,25
+         LA    7,MAT
+ELEMSIG  ZAP   VAL,0(1,7)
+         UNPK  ELEM,VAL
+         MVZ   ELEM(1),=X'FF'
+         WTO   MF=(E,ELEM-4)
+         LA    7,1(7)
+         BCT   6,ELEMSIG
+         WTO   '-------------------------------------------'
+         B     MENU
+
+**********************************************************************
+* MUESTRO EL MENU
+**********************************************************************
+S_MENU   WTO   '--------------      MENU     --------------'
+         WTO   '1) INGRESAR TRAMO'
+         WTO   '2) VER MATRIZ'
+         WTO   '3) SALIR'
+         WTO   '-------------------------------------------'
+         BR    5
+
+**********************************************************************
+* VARIABLES
+**********************************************************************
+MAT      DC    25PL1'0'
+
+OPCION   DS    CL1
+
+WAITECB  DC    F'0'
+
+VAL      DS    PL1
+
+         DC    H'5'
+         DC    H'0'
+ELEM     DS    CL1
+
+VAL_X    DS    CL2
+VAL_Y    DS    CL2
+
+VAL_X_P  DS    PL2
+VAL_Y_P  DS    PL2
+
+VAL_X_B  DS    F
+VAL_Y_B  DS    F
+
+         END
