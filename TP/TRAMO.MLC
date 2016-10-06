@@ -2,9 +2,13 @@
 * PRUEBA PARA AGREGAR LOS TRAMOS A LA MATRIZ
 **********************************************************************
 TRAMO    SUBENTRY BASES=(3)
-         BAL   5,INIT_MAT
-MENU     BAL   5,S_MENU
-         WTOR  'INGRESE UNA OPCION [1-3]',OPCION,,WAITECB
+         B     INIT_MAT
+MENU     WTO   '--------------      MENU     --------------'
+         WTO   '1) INGRESAR TRAMO'
+         WTO   '2) VER MATRIZ'
+         WTO   '3) SALIR'
+         WTO   '-------------------------------------------'
+M_OPC    WTOR  'INGRESE UNA OPCION [1-3]',OPCION,,WAITECB
          WAIT  ECB=WAITECB
          CLI   OPCION,C'1'
          BE    ADD_TRAM
@@ -20,12 +24,12 @@ FIN      WTO   'FIN'
 **********************************************************************
 * INCIALIZO LA MATRIZ
 **********************************************************************
-INIT_MAT LA    6,25
-         LA    7,MAT
-CICLO    ZAP   0(1,7),=P'0'
-         LA    7,1(7)
-         BCT   6,CICLO
-         BR    5
+INIT_MAT LA    4,25
+         LA    5,MAT
+CICLO    ZAP   0(1,5),=P'0'
+         LA    5,1(5)
+         BCT   4,CICLO
+         B     MENU
 
 **********************************************************************
 * PIDO EL INICIO Y FIN DEL TRAMO
@@ -34,39 +38,50 @@ ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          WAIT  ECB=WAITECB
          WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          WAIT  ECB=WAITECB
+*        CARGO LA DIR DE LA MATRIZ
+         LA    9,MAT
+*        ME MUEVO HASTA LA FILA
          PACK  VAL_X_P,VAL_X
+         MP    VAL_X_P,LONGFILP
+         CVB   4,VAL_X_P
+         AR    9,4
+*        ME MUEVO HASTA LA COLUMNA
          PACK  VAL_Y_P,VAL_Y
-         CVB   9,VAL_X_P
-         MVN   VAL_X_B,9
-         CVB   9,VAL_Y_P
-         MVN   VAL_Y_B,9
-         WTO   'OK'
+         MP    VAL_Y_P,LONGCOLP
+         CVB   4,VAL_Y_P
+         AR    9,4
+         ZAP   0(1,9),=P'1'
+         
+*        CARGO LA DIR DE LA MATRIZ PARA LA PARTE INVERTIDA
+         LA    9,MAT
+*        ME MUEVO HASTA LA FILA
+         PACK  VAL_X_P,VAL_X
+         MP    VAL_X_P,LONGCOLP
+         CVB   4,VAL_X_P
+         AR    9,4
+*        ME MUEVO HASTA LA COLUMNA
+         PACK  VAL_Y_P,VAL_Y
+         MP    VAL_Y_P,LONGFILP
+         CVB   4,VAL_Y_P
+         AR    9,4
+         ZAP   0(1,9),=P'1'        
+         
          B     MENU
 
 **********************************************************************
 * MUESTRO LA MATRIZ
 **********************************************************************
 VER_MAT  WTO   '-------------------------------------------'
-         LA    6,25
-         LA    7,MAT
-ELEMSIG  ZAP   VAL,0(1,7)
+         LA    4,25
+         LA    5,MAT
+ELEMSIG  ZAP   VAL,0(1,5)
          UNPK  ELEM,VAL
          MVZ   ELEM(1),=X'FF'
          WTO   MF=(E,ELEM-4)
-         LA    7,1(7)
-         BCT   6,ELEMSIG
+         LA    5,1(5)
+         BCT   4,ELEMSIG
          WTO   '-------------------------------------------'
          B     MENU
-
-**********************************************************************
-* MUESTRO EL MENU
-**********************************************************************
-S_MENU   WTO   '--------------      MENU     --------------'
-         WTO   '1) INGRESAR TRAMO'
-         WTO   '2) VER MATRIZ'
-         WTO   '3) SALIR'
-         WTO   '-------------------------------------------'
-         BR    5
 
 **********************************************************************
 * VARIABLES
@@ -89,7 +104,6 @@ VAL_Y    DS    CL2
 VAL_X_P  DS    FD
 VAL_Y_P  DS    FD
 
-VAL_X_B  DS    H
-VAL_Y_B  DS    H
-
+LONGFILP DC    P'5'
+LONGCOLP DC    P'1'
          END
