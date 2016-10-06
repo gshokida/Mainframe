@@ -37,7 +37,9 @@ ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          PACK  VAL_X_P,VAL_X
          PACK  VAL_Y_P,VAL_Y
          CVB   9,VAL_X_P
+         MVN   VAL_X_B,9
          CVB   9,VAL_Y_P
+         MVN   VAL_Y_B,9
          WTO   'OK'
          B     MENU
 
@@ -84,10 +86,10 @@ ELEM     DS    CL1
 VAL_X    DS    CL2
 VAL_Y    DS    CL2
 
-VAL_X_P  DS    PL2
-VAL_Y_P  DS    PL2
+VAL_X_P  DS    FD
+VAL_Y_P  DS    FD
 
-VAL_X_B  DS    F
-VAL_Y_B  DS    F
+VAL_X_B  DS    H
+VAL_Y_B  DS    H
 
          END
