@@ -25,16 +25,26 @@ FINARCH  CLOSE ARCHIN
          WAIT  ECB=WAITECB
          WTOR  'COL',COLC,,WAITECB
          WAIT  ECB=WAITECB
+         LA    9,MATRIZ
          PACK  DOBLE,FILC
          MP    DOBLE,LONGFILP
          CVB   4,DOBLE
+         AR    9,4
          L     5,LONGCOLF
          BAL   6,SUMAVEC
+         
          PACK  DOBLE,COLC
          MP    DOBLE,LONGCOLP
          CVB   4,DOBLE
+         AR    9,4
          L     5,LONGFILF
          BAL   6,SUMAVEC
+         PACK  NUMP,0(2,9)
+         SP    SUMAP-NUMP
+         
+         UNPK  SUMAC,SUMAP
+         MVZ   SUMAC+15(1),=X'FF'
+         WTO   MF(E,SUMAC-4)
          SUBEXIT
 
 ***********************************************************************
@@ -98,5 +108,9 @@ NUMP     DS    PL2
 
 LONGCOLP DC    P'2'
 LONGFILF DC    F'42'
+
+         DC    H'20'
+         DC    H'0'
+SUMAC    DS    CL16
 
          END
