@@ -2,45 +2,51 @@
 *INICIO
 **********************************************************************
 TP       SUBENTRY BASES=(3,4)
-         BAL   5,INICIAR
-         BAL   5,CANTEST *INGRESAR CANTIDAD ESTACIONES
-MENU	 BAL   5,PRINT_M
-         WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
+         B     INICIAR
+MENU	 B     PRINT_M
+M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 WAIT  ECB=WAITECB 
-         CLC   OPCION,=C'1'
+         CLI   OPCION,C'1'
 		 BE    TRAMO *INGRESAR TRAMO
-		 CLC   OPCION,=C'2'
+		 CLI   OPCION,C'2'
 		 BE    LINEAS *VER LINEAS
-		 CLC   OPCION,=C'3'
+		 CLI   OPCION,C'3'
 		 BE    VEREST *VER ESTACIONES
-		 CLC   OPCION,=C'4'
+		 CLI   OPCION,C'4'
 		 BE    FIN
-		 
 		 WTO   'OPCION NO VALIDA'
 		 B     MENU
-		 
 FIN      WTO   '=========>    FIN    <========='  
          SUBEXIT
 
 
 **********************************************************************
-*INICIAR VARIABLES
+* INICIAR VARIABLES
+* Y PIDO CANTIDAD DE ESTACIONES
+* USO R5 PARA INICIAR EL VECTOR
 **********************************************************************
 INICIAR  ZAP   MAXEST,=P'20'
          ZAP   MINEST,=P'1'
+         BAL   5,INI_VNL
+         B     CANTEST
+         
+**********************************************************************
+* INICIAR VECTOR CON NUMERO DE LINEAS Y SI SE MOSTRO LA ESTACION
+* VUELVO CON R5
+* USO R6 PARA LA DIRECCION Y R7 PARA CICLAR
+**********************************************************************
 * CARGO LA MATRIZ DE NUMERO DE LINEA
-         LA    7,V_NUMLIN 
-         LA    8,20
-V_NL     ZAP   0(2,7),=P'0'
-         LA    7,2(7)
-         BCT   9,V_NL
+INI_VNL  LA    6,V_NUMLIN 
+         LA    7,20
+V_NL     ZAP   0(2,6),=P'0'
+         LA    6,2(6)
+         BCT   7,V_NL
 * CARGO LA MATRIZ DE VISTA
-         LA    7,V_VISTO
-         LA    8,20
-V_VIS    ZAP   0(1,7),=P'0'
-         LA    7,1(7)
-         BCT   9,V_VIS
-                  
+INI_VVI  LA    6,V_VISTO
+         LA    7,20
+V_VIS    ZAP   0(1,6),=P'0'
+         LA    6,1(6)
+         BCT   7,V_VIS
          BR    5
 
 **********************************************************************
@@ -52,73 +58,105 @@ PRINT_M  WTO   '--------------      MENU     --------------'
          WTO   '3) VER CANTIDAD DE ESTACIONES'		 
          WTO   '4) SALIR'
          WTO   '-------------------------------------------'
-		 BR    5
+		 B     M_OPC
 
 **********************************************************************
 *CANTIDAD DE ESTACIONES
+*USO R5 PARA LLAMAR A LAS RUTINAS DE VALIDACION DE NUMERO Y RANGO
 **********************************************************************
 CANTEST  WTOR  'Ingrese la cantidad de estaciones?',CANT,,WAITECB
          WAIT  ECB=WAITECB
-         BAL   6,VALEST *VERIFICO SI LOS DOS CHAR SON NUMEROS
-         BAL   6,RANGO *VALOR EN RANGO
-         BR    5
+         BAL   5,VALEST *VERIFICO SI LOS DOS CHAR SON NUMEROS
+         BAL   5,RANGO *VALOR EN RANGO
+         B     MENU
 
 **********************************************************************
 * VALIDO CANTIDAD DE ESTACIONES
+* VUELVO CON R5
+* USO R6 PARA LA VALIDACION
 **********************************************************************
-VALEST   LA    7,CANT
-         CLC   0(1,7),=C'0'
+VALEST   LA    6,CANT
+         CLC   0(1,6),=C'0'
          BL    NVALID1
-         CLC   0(1,7),=C'9'
+         CLC   0(1,6),=C'9'
          BH    NVALID1
-         CLC   1(1,7),=C'0'
+         CLC   1(1,6),=C'0'
          BL    NVALID2
-         CLC   1(1,7),=C'9'
+         CLC   1(1,6),=C'9'
          BH    NVALID2
-DOPAK    PACK  CANTPAK,0(2,7)
-VALBK    BR    6
+DOPAK    PACK  CANTPAK,0(2,6)
+VALBK    BR    5
          
 NVALID1  WTO   'NUMERO NO VALIDO'
          B     CANTEST
-NVALID2  MVC   1(1,7),0(7)
-         MVI   0(7),C'0'
+NVALID2  MVC   1(1,6),0(6)
+         MVI   0(6),C'0'
          B     DOPAK
 
 ***********************************************************************
-***********************************************************************
 *        VERIFICO SI EL RANGO ES EL CORRECTO
-***********************************************************************
+*        VUELVO CON R5
 ***********************************************************************  
 RANGO    CP    CANTPAK,MAXEST
          BH    NRANGO
          CP    CANTPAK,MINEST
          BL    NRANGO
-         BR    6
+         BR    5
 
 NRANGO   WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
          B     CANTEST
 
 **********************************************************************
-*INGRESAR TRAMOS
+*        INGRESAR TRAMOS
+*        USO R5 Y R9
 **********************************************************************
-TRAMO    WTO   'INGRESO TRAMO'
+TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
+         WAIT  ECB=WAITECB
+         WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
+         WAIT  ECB=WAITECB
+*        CARGO LA DIR DE LA MATRIZ
+         LA    9,MAT
+*        ME MUEVO HASTA LA FILA
+         PACK  VAL_X_P,VAL_X
+         MP    VAL_X_P,LONGFILP
+         CVB   5,VAL_X_P
+         AR    9,5
+*        ME MUEVO HASTA LA COLUMNA
+         PACK  VAL_Y_P,VAL_Y
+         MP    VAL_Y_P,LONGCOLP
+         CVB   5,VAL_Y_P
+         AR    9,5
+         ZAP   0(1,9),=P'1'
+*        CARGO LA DIR DE LA MATRIZ PARA LA PARTE INVERTIDA
+         LA    9,MAT
+*        ME MUEVO HASTA LA FILA
+         PACK  VAL_X_P,VAL_X
+         MP    VAL_X_P,LONGCOLP
+         CVB   5,VAL_X_P
+         AR    9,5
+*        ME MUEVO HASTA LA COLUMNA
+         PACK  VAL_Y_P,VAL_Y
+         MP    VAL_Y_P,LONGFILP
+         CVB   5,VAL_Y_P
+         AR    9,5
+         ZAP   0(1,9),=P'1'
          B     MENU
 
 **********************************************************************
-* MUESTRO LINEAS   
+*        MUESTRO LINEAS   
 **********************************************************************
 LINEAS   WTO   'MUESTRO LINEAS'
          B     MENU
 
 **********************************************************************
-* MUESTRO CANTIDAD DE ESTACIONES   
+*        MUESTRO CANTIDAD DE ESTACIONES   
 **********************************************************************
 VEREST   MVC   TOTESTA+21(2),CANT
          WTO   MF=(E,TOTESTA-4)
          B     MENU
 
 **********************************************************************
-*DEFINICION DE VARIABLES
+*        DEFINICION DE VARIABLES
 **********************************************************************
 * MAXIMO Y MINIMO DE LAS ESTACIONES
 MAXEST   DS    PL2
@@ -137,8 +175,6 @@ TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
 
 *PARA EL WTOR
 WAITECB  DC    F'0'
-WTOBLOCK DC    H'6'
-         DC    H'0'
 
 *PARA LAS OPCIONES DEL MENU
 OPCION   DS    CL1
@@ -150,13 +186,14 @@ V_NUMLIN DS    20PL2
 V_VISTO  DS    20PL1
 
 *MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
-MAT      DS    400PL1
+MAT      DC    400PL1'0'
 
 *PARA INGRESAR LOS TRAMOS ESTACION INICIAL Y FINAL
-EST1     DS    CL2
-EST2     DS    CL2
-
-
-
+VAL_X    DS    CL2
+VAL_Y    DS    CL2
+VAL_X_P  DS    FD
+VAL_Y_P  DS    FD
+LONGFILP DC    P'20'
+LONGCOLP DC    P'1'
 
          END
