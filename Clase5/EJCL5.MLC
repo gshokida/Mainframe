@@ -1,0 +1,100 @@
+***********************************************************************
+*EJERCICIO DE CLASE 5 
+*POPULAR CON ARCHIVOY MOTRAR POR PANTALLA LA SUMATORIA DE LA CRUZ
+*ELEGIDA ENTRE FILA Y COLUMNA
+***********************************************************************
+EJCL5    SUBENTRY BASES=(3)
+         OPEN  (ARCHIN,(INPUT))
+LEER     GET   ARCHIN,REG
+         BAL   4,VALXY
+         CLI   RES,C'V'
+         BNE   LEER
+         ZAP   DOBLE,FILP
+         MP    DOBLE,LONGFILP
+         CVB   5,DOBLE *EL DESPLAZAMIENTO EN FILA DE LA MATRIZ
+         LA    7,0
+         IC    7,COLB
+         M     6,LONGCOLF
+         AR    4,5 *DESPLAZAMIENTO DE LA MATRIZ MAS DESPLAZ FILA
+         AR    4,7 *MAS DESPLAZAMIENTO COLUMNA
+         MVC   0(2,4),NUMZ
+         B     LEER
+FINARCH  CLOSE ARCHIN
+*PEDIR LA COLUMNA Y LA FILA PARA HACER LA SUMATORIA
+         WTOR  'FILA',FILC,,WAITECB
+         WAIT  ECB=WAITECB
+         WTOR  'COL',COLC,,WAITECB
+         WAIT  ECB=WAITECB
+         PACK  DOBLE,FILC
+         MP    DOBLE,LONGFILP
+         CVB   4,DOBLE
+         L     5,LONGCOLF
+         BAL   6,SUMAVEC
+         PACK  DOBLE,COLC
+         MP    DOBLE,LONGCOLP
+         CVB   4,DOBLE
+         L     5,LONGFILF
+         BAL   6,SUMAVEC
+         SUBEXIT
+
+***********************************************************************
+* VALIDADOR DE FILA Y COLUMNA
+***********************************************************************
+VALXY    CP    FILP,=P'0'
+         BL    INVALIDO
+         CP    FILP,=P'20'
+         BH    INVALIDO
+         CLI   COLB,X'14'
+         BH    INVALIDO
+         MVI   RES,C'V'
+         B     FINVALXY
+INVALIDO MVI   RES,C'I'
+FINVALXY BR    4
+
+***********************************************************************
+* SUMA LOS VECTORES 
+* R4: DESPLAZAMIENTO PRIMER ELEMENTO
+* R5: MOVIMIENTO AL PROXIMO
+* BR: R6
+***********************************************************************
+SUMAVEC  LA    7,21
+         LA    8,MATRIZ
+         AR    4,8
+SUMASIG  PACK  NUMP,0(2,4)
+         AP    SUMAP,NUMP
+         LA    4,5
+         BCT   7,SUMASIG
+         BR    6
+
+***********************************************************************
+* VARIABLES
+***********************************************************************
+
+ARCHIN   DCB   DDNAME=FILENAME,LRECL=5,RECFM=FB,MACRF=GM,EODAD=FINARCH
+FILENAME DC    C'ZONA.DAT',X'00'
+
+REG      DS    0XL5
+FILP     DS    PL2
+COLB     DS    B
+NUMZ     DS    ZL2
+
+RES      DS    CL1
+
+MATRIZ   DS    441ZL2'0' *SI NO FUNCIONA CL2'00'
+
+DOBLE    DS    FD * CVB SOLO FUNCIONA CON DOBLE PALABRA
+
+LONGFILP DC    P'42'
+
+LONGCOLF DC    F'2'
+
+FILC     DS    CL2
+COLC     DS    CL2
+
+SUMAP    DC    PL16'0'
+NUMP     DS    PL2
+
+LONGCOLP DC    P'2'
+LONGFILF DC    F'42'
+
+         END
