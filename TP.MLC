@@ -3,7 +3,12 @@
 **********************************************************************
 TP       SUBENTRY BASES=(3,4)
          B     INICIAR
-MENU	 B     PRINT_M
+MENU	 WTO   '--------------      MENU     --------------'
+         WTO   '1) INGRESAR TRAMO'
+         WTO   '2) VER LINEAS'
+         WTO   '3) VER CANTIDAD DE ESTACIONES'		 
+         WTO   '4) SALIR'
+         WTO   '-------------------------------------------'
 M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 WAIT  ECB=WAITECB 
          CLI   OPCION,C'1'
@@ -18,7 +23,6 @@ M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 B     MENU
 FIN      WTO   '=========>    FIN    <========='  
          SUBEXIT
-
 
 **********************************************************************
 * INICIAR VARIABLES
@@ -48,17 +52,6 @@ V_VIS    ZAP   0(1,6),=P'0'
          LA    6,1(6)
          BCT   7,V_VIS
          BR    5
-
-**********************************************************************
-*MENU
-**********************************************************************
-PRINT_M  WTO   '--------------      MENU     --------------'
-         WTO   '1) INGRESAR TRAMO'
-         WTO   '2) VER LINEAS'
-         WTO   '3) VER CANTIDAD DE ESTACIONES'		 
-         WTO   '4) SALIR'
-         WTO   '-------------------------------------------'
-		 B     M_OPC
 
 **********************************************************************
 *CANTIDAD DE ESTACIONES
