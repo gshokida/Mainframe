@@ -36,17 +36,29 @@ CICLO    ZAP   0(1,5),=P'0'
 **********************************************************************
 ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          WAIT  ECB=WAITECB
-         WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
+         MVC   TRAM_XYC,VAL_X
+         BAL   5,VALTRAMO
+         CLI   RES_TRC,C'F'
+         BE    ADD_TRAM
+         MVC   VAL_X,TRAM_XYC
+FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          WAIT  ECB=WAITECB
+         MVC   TRAM_XYC,VAL_Y
+         BAL   5,VALTRAMO
+         CLI   RES_TRC,C'F'
+         BE    FIN_TRAM
+         MVC   VAL_Y,TRAM_XYC
 *        CARGO LA DIR DE LA MATRIZ
          LA    9,MAT
 *        ME MUEVO HASTA LA FILA
          PACK  VAL_X_P,VAL_X
+         SP    VAL_X_P,=P'1'
          MP    VAL_X_P,LONGFILP
          CVB   4,VAL_X_P
          AR    9,4
 *        ME MUEVO HASTA LA COLUMNA
          PACK  VAL_Y_P,VAL_Y
+         SP    VAL_Y_P,=P'1'
          MP    VAL_Y_P,LONGCOLP
          CVB   4,VAL_Y_P
          AR    9,4
@@ -56,11 +68,13 @@ ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          LA    9,MAT
 *        ME MUEVO HASTA LA FILA
          PACK  VAL_X_P,VAL_X
+         SP    VAL_X_P,=P'1'
          MP    VAL_X_P,LONGCOLP
          CVB   4,VAL_X_P
          AR    9,4
 *        ME MUEVO HASTA LA COLUMNA
          PACK  VAL_Y_P,VAL_Y
+         SP    VAL_Y_P,=P'1'
          MP    VAL_Y_P,LONGFILP
          CVB   4,VAL_Y_P
          AR    9,4
@@ -69,16 +83,63 @@ ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          B     MENU
 
 **********************************************************************
+* VALIDO EL TRAMO INICIAL O FINAL
+* VUELVO CON R5
+* USO R6 PARA LA VALIDACION
+**********************************************************************
+VALTRAMO LA    6,TRAM_XYC
+         CLC   0(1,6),=C'0'
+         BL    NVALTR1
+         CLC   0(1,6),=C'9'
+         BH    NVALTR1
+         CLC   1(1,6),=C'0'
+         BL    NVALTR2
+         CLC   1(1,6),=C'9'
+         BH    NVALTR2
+         MVI   RES_TRC,C'T'
+VAL_TRBK BR    5
+         
+NVALTR1  WTO   'NUMERO NO VALIDO'
+         MVI   RES_TRC,C'F'
+         B     VAL_TRBK
+NVALTR2  MVC   1(1,6),0(6)
+         MVI   0(6),C'0'
+         MVI   RES_TRC,C'T'
+         B     VAL_TRBK
+
+**********************************************************************
 * MUESTRO LA MATRIZ
 **********************************************************************
 VER_MAT  WTO   '-------------------------------------------'
-         LA    4,25
+         LA    4,5
          LA    5,MAT
 ELEMSIG  ZAP   VAL,0(1,5)
-         UNPK  ELEM,VAL
-         MVZ   ELEM(1),=X'FF'
+         UNPK  ELEMC,VAL
+         MVZ   ELEMC(1),=X'FF'
+         MVC   ELEM(1),ELEMC
+         
+         ZAP   VAL,1(1,5)
+         UNPK  ELEMC,VAL
+         MVZ   ELEMC(1),=X'FF'
+         MVC   ELEM+1(1),ELEMC
+         
+         ZAP   VAL,2(1,5)
+         UNPK  ELEMC,VAL
+         MVZ   ELEMC(1),=X'FF'
+         MVC   ELEM+2(1),ELEMC
+         
+         ZAP   VAL,3(1,5)
+         UNPK  ELEMC,VAL
+         MVZ   ELEMC(1),=X'FF'
+         MVC   ELEM+3(1),ELEMC
+         
+         ZAP   VAL,4(1,5)
+         UNPK  ELEMC,VAL
+         MVZ   ELEMC(1),=X'FF'
+         MVC   ELEM+4(1),ELEMC
+         
          WTO   MF=(E,ELEM-4)
-         LA    5,1(5)
+         LA    5,5(5)
          BCT   4,ELEMSIG
          WTO   '-------------------------------------------'
          B     MENU
@@ -94,9 +155,11 @@ WAITECB  DC    F'0'
 
 VAL      DS    PL1
 
-         DC    H'5'
+         DC    H'9'
          DC    H'0'
-ELEM     DS    CL1
+ELEM     DS    CL5
+
+ELEMC    DS    CL1
 
 VAL_X    DS    CL2
 VAL_Y    DS    CL2
@@ -106,4 +169,8 @@ VAL_Y_P  DS    FD
 
 LONGFILP DC    P'5'
 LONGCOLP DC    P'1'
+
+TRAM_XYC DS    CL2
+RES_TRC  DS    CL1
+
          END
