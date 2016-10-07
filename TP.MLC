@@ -118,11 +118,13 @@ TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          LA    9,MAT
 *        ME MUEVO HASTA LA FILA
          PACK  VAL_X_P,VAL_X
+         SP    VAL_X_P,=P'1'
          MP    VAL_X_P,LONGFILP
          CVB   5,VAL_X_P
          AR    9,5
 *        ME MUEVO HASTA LA COLUMNA
          PACK  VAL_Y_P,VAL_Y
+         SP    VAL_Y_P,=P'1'
          MP    VAL_Y_P,LONGCOLP
          CVB   5,VAL_Y_P
          AR    9,5
@@ -131,11 +133,13 @@ TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          LA    9,MAT
 *        ME MUEVO HASTA LA FILA
          PACK  VAL_X_P,VAL_X
+         SP    VAL_X_P,=P'1'
          MP    VAL_X_P,LONGCOLP
          CVB   5,VAL_X_P
          AR    9,5
 *        ME MUEVO HASTA LA COLUMNA
          PACK  VAL_Y_P,VAL_Y
+         SP    VAL_Y_P,=P'1'
          MP    VAL_Y_P,LONGFILP
          CVB   5,VAL_Y_P
          AR    9,5
