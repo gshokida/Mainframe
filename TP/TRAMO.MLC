@@ -40,11 +40,19 @@ ADD_TRAM WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          BAL   5,VALTRAMO
          CLI   RES_TRC,C'F'
          BE    ADD_TRAM
+         PACK  VAL_XYP,VAL_X
+         BAL   5,VALRANGT
+         CLI   RES_TRC,C'F'
+         BE    ADD_TRAM
          MVC   VAL_X,TRAM_XYC
 FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          WAIT  ECB=WAITECB
          MVC   TRAM_XYC,VAL_Y
          BAL   5,VALTRAMO
+         CLI   RES_TRC,C'F'
+         BE    FIN_TRAM
+         PACK  VAL_XYP,VAL_Y
+         BAL   5,VALRANGT
          CLI   RES_TRC,C'F'
          BE    FIN_TRAM
          MVC   VAL_Y,TRAM_XYC
@@ -108,6 +116,19 @@ NVALTR2  MVC   1(1,6),0(6)
          B     VAL_TRBK
 
 **********************************************************************
+* VALIDO EL RANGO DEL TRAMO
+**********************************************************************
+VALRANGT CP    VAL_XYP,MAXEST
+         BH    NOVAL_R
+         CP    VAL_XYP,MINEST
+         BL    NOVAL_R
+         MVI   RES_TRC,C'T'
+FINVALR  BR    5
+
+NOVAL_R  WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
+         MVI   RES_TRC,C'F'
+         B     FINVALR
+**********************************************************************
 * MUESTRO LA MATRIZ
 **********************************************************************
 VER_MAT  WTO   '-------------------------------------------'
@@ -170,7 +191,10 @@ VAL_Y_P  DS    FD
 LONGFILP DC    P'5'
 LONGCOLP DC    P'1'
 
+MAXEST   DC    P'5'
+MINEST   DC    P'1'
+
 TRAM_XYC DS    CL2
 RES_TRC  DS    CL1
-
+VAL_XYP  DS    PL2
          END
