@@ -1,0 +1,80 @@
+EXAM1    SUBENTRY BASES=(3)
+         OPEN  (ARCHIN,(INPUT))
+PROXREG  GET   ARCHIN,REG
+         LA    4,TABCO
+         LA    5,TABINST
+         LA    6,TABTIPO
+PROXCO   CLC   CO,0(4)
+         BE    INSTCO
+         LA    4,1(4)
+         LA    5,4(5)
+         LA    6,1(6)
+         B     PROXCO
+INSTCO   MVC   EBCINST(4),0(5)
+         LA    8,0
+         IC    8,R1M3
+         SRDL  8,4
+         SRL   9,28
+         CVD   8,DOBLE
+         UNPK  EBCDR1,DOBLE
+         MVZ   EBCDR1+1(1),=X'FF'
+         CVD   9,DOBLE
+         UNPK  EBCDM3,DOBLE
+         MVZ   EBCDM3+1(1),=X'FF'
+         LA    8,0
+         ICM   8,3,B2D2
+         SRDL  8,12
+         SRL   9,20
+         CVD   8,DOBLE
+         UNPK  EBCDB2,DOBLE
+         MVZ   EBCDB2+1(1),=X'FF'
+         CVD   9,DOBLE
+         UNPK  EBCDD2,DOBLE
+         MVZ   EBCDD2+3(1),=X'FF'
+         MVC   EBCINST+5(2),EBCDR1
+         CLI   0(6),X'02'
+         BE    INSTT2
+INSTT1   MVC   EBCINST+8(11),TEMPT1
+         MVC   EBCINST+8(2),EBCDM3
+         MVC   EBCINST+11(4),EBCDD2
+         MVC   EBCINST+16(2),EBCDB2
+         B     MOSTRAR
+INSTT2   MVC   EBCINST+8(11),TEMPT2
+         MVC   EBCINST+8(4),EBCDD2
+         MVC   EBCINST+13(2),EBCDB2
+         B     MOSTRAR
+MOSTRAR  WTO   MF=(E,WTOBLOCK)
+         B     PROXREG
+EOF      CLOSE ARCHIN
+         SUBEXIT
+         
+ARCHIN   DCB   DDNAME=FILENAME,LRECL=4,RECFM=FB,MACRF=GM,EODAD=EOF
+FILENAME DC    C'INSTRUC.DAT',X'00'
+
+REG      DS    0CL4
+CO       DS    X
+R1M3     DS    X
+B2D2     DS    XL2
+
+TABCO    DC    X'BFBE8889'
+TABINST  DC    C'ICM0STCMSRL0SLL0'
+TABTIPO  DC    X'01010202'
+
+TEMPT1   DS    C'M3,-D2(B2)'
+TEMPT2   DS    C'  D2(B2)  '
+
+* 4 CARACTERES, ESPACIO, R1 2 BYTES, M3 2 BYTES, DESPLAZAMIENTO 4
+* DIGITOS() 
+WTOBLOCK DC    H'23'
+         DC    H'0'
+EBCINST  DS    CL19'     R1,'
+  
+DOBLE    DS    FD
+
+EBCDR1   DS    CL2
+EBCDM3   DS    CL2
+
+EBCDB2   DS    CL2
+EBCDD2   DS    CL4
+
+         END
