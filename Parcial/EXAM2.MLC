@@ -1,0 +1,83 @@
+*TABLERO DE 50X50 QUE CONTIENE UN VALOR DE CANTIDAD DE BOMBAS QUE LE
+*AFECTAN, LEO DEL ARCHIVO BOMBAS.DAT QUE CONTIENE LAS COORDENADAS (X,Y)
+*Y TIENE UNA POTENCIA QUE ES LA CANTIDAD DE CELDAS QUE AFECTA
+*HORIZONTAL Y VERTICALMENTE
+EXAM2    SUBENTRY BASES=(3)
+         OPEN  (ARCHIN,(INPUT))
+PROXREG  GET   ARCHIN,REG
+         BAL   4,VALREG
+         CLI   RES,C'V'
+         BNE   PROXREG
+         PACK  DOBLE,COORXC
+         SP    DOBLE,=P'1'
+         MP    DOBLE,=P'2'
+         CVB   4,DOBLE
+         PACK  DOBLE,COORYC
+         SP    DOBLE,=P'1'
+         MP    DOBLE,=P'100'
+         CVB   5,DOBLE
+         LA    6,TABLERO
+         AR    6,4
+         AR    6,5
+         AP    0(2,6),=P'1'
+         LA    4,0
+         IC    4,POTB
+         ZAP   DOBLE,=P'-100'
+         BAL   5,EXPLOTAR
+         ZAP   DOBLE,=P'-2'
+         BAL   5,EXPLOTAR
+         ZAP   DOBLE,=P'100'
+         BAL   5,EXPLOTAR
+         ZAP   DOBLE,=P'2'
+         BAL   5,EXPLOTAR
+         B     PROXREG
+EOF      CLOSE ARCHIN
+         SUBEXIT
+***********************************************************************
+* RUTINA PARA EXPANDIR LAS BOMBAS SEGUN LA POTENCIA
+* BAL CON R5
+* (R4): POTENCIA (BINARIO)
+* (R6): POSICION DE LA BOMBA COORD(X,Y) EN LA MATRIZ (DIR)
+* DOBLE: MOVIMIENTO (PACKED)
+***********************************************************************
+EXPLOTAR LR    7,4
+         LR    8,6
+         CVB   9,DOBLE
+MUEVE    AR    8,9
+         AP    0(2,8),=P'1'
+         BCT   7,MUEVE
+         BR    5
+***********************************************************************
+
+VALREG   MVI   RES,C'V'
+         BR    4
+***********************************************************************
+
+* ESTO REEMPLAZARIA LOS ZAP BAL DEL PROGRAMA PRINCIPAL
+SUBRUT   LA    10,4
+         LA    11,TABLA
+SIGUE    ZAP   DOBLE,0(2,11)
+         BAL   5,EXPLOTAR
+         LA    11,2(11)
+         BCT   10,SIGUE
+
+***********************************************************************
+
+
+ARCHIN   DCB   DDNAME=FILENAME,LRECL=5,RECFM=FB,MACRF=GM,EODAD=EOF
+FILENAME DC    C'BOMBAS.DAT',X'00'
+
+TABLERO  DC    2500PL2'0'
+
+REG      DS    0CL5
+COORXC   DS    CL2
+COORYC   DS    CL2
+POTB     DS    X
+
+DOBLE    DS    FD
+
+RES      DS    CL1
+
+TABLA    DC    PL2'100',PL2'-100',PL2'2',PL2'-2'
+
+         END
