@@ -26,7 +26,7 @@ FIN      WTO   'FIN'
 **********************************************************************
 INIT_MAT LA    4,25
          LA    5,MAT
-CICLO    ZAP   0(1,5),=P'0'
+CICLO    MVC   0(1,5),=C'0'
          LA    5,1(5)
          BCT   4,CICLO
          B     MENU
@@ -70,7 +70,7 @@ FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          MP    VAL_Y_P,LONGCOLP
          CVB   4,VAL_Y_P
          AR    9,4
-         ZAP   0(1,9),=P'1'
+         MVC   0(1,9),=C'1'
          
 *        CARGO LA DIR DE LA MATRIZ PARA LA PARTE INVERTIDA
          LA    9,MAT
@@ -86,7 +86,7 @@ FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          MP    VAL_Y_P,LONGFILP
          CVB   4,VAL_Y_P
          AR    9,4
-         ZAP   0(1,9),=P'1'        
+         MVC   0(1,9),=C'1'        
          
          B     MENU
 
@@ -134,31 +134,7 @@ NOVAL_R  WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
 VER_MAT  WTO   '-------------------------------------------'
          LA    4,5
          LA    5,MAT
-ELEMSIG  ZAP   VAL,0(1,5)
-         UNPK  ELEMC,VAL
-         MVZ   ELEMC(1),=X'FF'
-         MVC   ELEM(1),ELEMC
-         
-         ZAP   VAL,1(1,5)
-         UNPK  ELEMC,VAL
-         MVZ   ELEMC(1),=X'FF'
-         MVC   ELEM+1(1),ELEMC
-         
-         ZAP   VAL,2(1,5)
-         UNPK  ELEMC,VAL
-         MVZ   ELEMC(1),=X'FF'
-         MVC   ELEM+2(1),ELEMC
-         
-         ZAP   VAL,3(1,5)
-         UNPK  ELEMC,VAL
-         MVZ   ELEMC(1),=X'FF'
-         MVC   ELEM+3(1),ELEMC
-         
-         ZAP   VAL,4(1,5)
-         UNPK  ELEMC,VAL
-         MVZ   ELEMC(1),=X'FF'
-         MVC   ELEM+4(1),ELEMC
-         
+ELEMSIG  MVC   ELEM(5),0(5)
          WTO   MF=(E,ELEM-4)
          LA    5,5(5)
          BCT   4,ELEMSIG
@@ -168,19 +144,17 @@ ELEMSIG  ZAP   VAL,0(1,5)
 **********************************************************************
 * VARIABLES
 **********************************************************************
-MAT      DC    25PL1'0'
+MAT      DC    25CL1'0'
 
 OPCION   DS    CL1
 
 WAITECB  DC    F'0'
 
-VAL      DS    PL1
+VAL      DS    PL5
 
          DC    H'9'
          DC    H'0'
 ELEM     DS    CL5
-
-ELEMC    DS    CL1
 
 VAL_X    DS    CL2
 VAL_Y    DS    CL2
@@ -197,4 +171,5 @@ MINEST   DC    P'1'
 TRAM_XYC DS    CL2
 RES_TRC  DS    CL1
 VAL_XYP  DS    PL2
+
          END
