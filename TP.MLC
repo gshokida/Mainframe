@@ -6,8 +6,9 @@ TP       SUBENTRY BASES=(3,4)
 MENU	 WTO   '--------------      MENU     --------------'
          WTO   '1) INGRESAR TRAMO'
          WTO   '2) VER LINEAS'
-         WTO   '3) VER CANTIDAD DE ESTACIONES'		 
+         WTO   '3) VER CANTIDAD DE ESTACIONES'
          WTO   '4) SALIR'
+         WTO   '5) MUESTRO MATRIZ'
          WTO   '-------------------------------------------'
 M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 WAIT  ECB=WAITECB 
@@ -19,6 +20,8 @@ M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 BE    VEREST *VER ESTACIONES
 		 CLI   OPCION,C'4'
 		 BE    FIN
+		 CLI   OPCION,C'5'
+		 BE    MOSTRARM
 		 WTO   'OPCION NO VALIDA'
 		 B     MENU
 FIN      WTO   '=========>    FIN    <========='  
@@ -101,42 +104,42 @@ NRANGO   WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
 
 **********************************************************************
 *        INGRESAR TRAMOS
-*        USO R5 Y R9
+*        USO R5 Y R6
 **********************************************************************
 TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          WAIT  ECB=WAITECB
          WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
          WAIT  ECB=WAITECB
 *        CARGO LA DIR DE LA MATRIZ
-         LA    9,MAT
+         LA    6,MAT
 *        ME MUEVO HASTA LA FILA
-         PACK  VAL_X_P,VAL_X
-         SP    VAL_X_P,=P'1'
-         MP    VAL_X_P,LONGFILP
-         CVB   5,VAL_X_P
-         AR    9,5
+         PACK  DOBLE,VAL_X
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGFILP
+         CVB   5,DOBLE
+         AR    6,5
 *        ME MUEVO HASTA LA COLUMNA
-         PACK  VAL_Y_P,VAL_Y
-         SP    VAL_Y_P,=P'1'
-         MP    VAL_Y_P,LONGCOLP
-         CVB   5,VAL_Y_P
-         AR    9,5
-         ZAP   0(1,9),=P'1'
+         PACK  DOBLE,VAL_Y
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGCOLP
+         CVB   5,DOBLE
+         AR    6,5
+         MVC   0(1,6),=C'1'
 *        CARGO LA DIR DE LA MATRIZ PARA LA PARTE INVERTIDA
-         LA    9,MAT
+         LA    6,MAT
 *        ME MUEVO HASTA LA FILA
-         PACK  VAL_X_P,VAL_X
-         SP    VAL_X_P,=P'1'
-         MP    VAL_X_P,LONGCOLP
-         CVB   5,VAL_X_P
-         AR    9,5
+         PACK  DOBLE,VAL_X
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGCOLP
+         CVB   5,DOBLE
+         AR    6,5
 *        ME MUEVO HASTA LA COLUMNA
-         PACK  VAL_Y_P,VAL_Y
-         SP    VAL_Y_P,=P'1'
-         MP    VAL_Y_P,LONGFILP
-         CVB   5,VAL_Y_P
-         AR    9,5
-         ZAP   0(1,9),=P'1'
+         PACK  DOBLE,VAL_Y
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGFILP
+         CVB   5,DOBLE
+         AR    6,5
+         MVC   0(1,6),=C'1'
          B     MENU
 
 **********************************************************************
@@ -152,6 +155,19 @@ VEREST   MVC   TOTESTA+21(2),CANT
          WTO   MF=(E,TOTESTA-4)
          B     MENU
 
+**********************************************************************
+*        MUESTRO MATRIZ
+**********************************************************************
+MOSTRARM WTO   '-------------------------------------------'
+         LA    6,20
+         LA    5,MAT
+ELEMSIG  MVC   ELEM(20),0(5)
+         WTO   MF=(E,ELEM-4)
+         LA    5,20(5)
+         BCT   6,ELEMSIG
+         WTO   '-------------------------------------------'
+         B     MENU
+         
 **********************************************************************
 *        DEFINICION DE VARIABLES
 **********************************************************************
@@ -183,14 +199,24 @@ V_NUMLIN DS    20PL2
 V_VISTO  DS    20PL1
 
 *MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
-MAT      DC    400PL1'0'
+MAT      DC    400CL1'0'
+
+*PARA CONVERTIR EN EMPAQUETADO
+DOBLE    DS    FD
 
 *PARA INGRESAR LOS TRAMOS ESTACION INICIAL Y FINAL
 VAL_X    DS    CL2
 VAL_Y    DS    CL2
-VAL_X_P  DS    FD
-VAL_Y_P  DS    FD
+
 LONGFILP DC    P'20'
 LONGCOLP DC    P'1'
+
+
+*SOLO PARA MOSTRAR MATRIZ
+VAL      DS    PL1
+
+         DC    H'24'
+         DC    H'0'
+ELEM     DS    CL20
 
          END
