@@ -1,21 +1,109 @@
 RECORRER SUBENTRY BASES=(3)
-         WTOR  'INGRESE VALOR MAXIMO',MAXC,,WAITECB
-         WAIT  ECB=WAITECB
-         PACK  DOBLE,MAXC     
-         CVB   4,DOBLE
-         
-         
+         B     LINEAS
+EXIT     WTO   'FIN'
          SUBEXIT
 
-MATRIZ   DC    400CL1'0'
+**********************************************************************
+* MUESTRO LAS LINEAS
+* USO R5 PARA POSICIONARME EN LA MATRIZ
+* R6 PARA POSICIONARME EN EL VECTOR DE LINEAS
+* R7 PARA SUMARLE LAS COLUMNAS A 
+**********************************************************************
+LINEAS   BAL   5,INI_VNL
+         LA    6,V_NUMLIN
+         ZAP   CONT_LIN,=P'0'
+         ZAP   M_CONT_X,=P'0'
+* CORRIMIENTO EN X DE LA MATRIZ
+NEXT_FIL ZAP   DOBLE,M_CONT_X
+         MP    DOBLE,=P'2'
+         CVB   7,DOBLE
+         LA    5,MAT
+         AR    5,7
+* SI NO TIENE LINEA ASIGNADA LE SUMO UNO AL CONTADOR Y SE LO AGREGO
+* AL VECTOR
+         CP    0(2,6),=P'0'
+         BNE   TIENE_L
+         AP    CONT_LIN,=P'1'
+         ZAP   0(2,6),CONT_LIN
+         LA    6,2(6)
+TIENE_L  ZAP   M_CONT_Y,=P'0'
+NEXT_COL ZAP   DOBLE,M_CONT_Y
+         MP    DOBLE,MAXEST
+         CVB   7,DOBLE
+         AR    5,7
+         CP    0(2,5),=P'1'
+         BE    UPD_LIN
+SIG_ELEM AP    M_CONT_Y,=P'1'
+         CP    M_CONT_X,CANTPAK
+         BNE   NEXT_COL
+         AP    M_CONT_X,=P'1'
+         CP    M_CONT_X,CANTPAK
+         BNE   NEXT_FIL
+         B     EXIT
+         
+**********************************************************************
+* MARCO LA LINEA CON EL VALOR, EN CASO DE TENER UN VALOR 
+* TENGO QUE ACTUALIZAR LOS OTROS VALORES QUE TENUIA
+* USO R5 PARA POSICIONARME EN LA MATRIZ
+* R6 PARA POSICIONARME EN EL VECTOR DE LINEAS
+* R7 PARA SUMARLE LAS COLUMNAS A 
+**********************************************************************
+UPD_LIN  WTO   'ACTUALIZO LAS LINEAS'
+         B     SIG_ELEM
+         
+**********************************************************************
+* INICIAR VECTOR CON NUMERO DE LINEAS Y SI SE MOSTRO LA ESTACION
+* VUELVO CON R5
+* USO R6 PARA LA DIRECCION Y R7 PARA CICLAR
+**********************************************************************
+* CARGO LA MATRIZ DE NUMERO DE LINEA
+INI_VNL  LA    6,V_NUMLIN 
+         LA    7,20
+V_NL     ZAP   0(2,6),=P'0'
+         LA    6,2(6)
+         BCT   7,V_NL
+* CARGO LA MATRIZ DE VISTA
+INI_VVI  LA    6,V_VISTO
+         LA    7,20
+V_VIS    MVC   0(1,6),=C'0'
+         LA    6,1(6)
+         BCT   7,V_VIS
+         BR    5
+         
+**********************************************************************
+*        DEFINICION DE VARIABLES
+**********************************************************************
+* MAXIMO Y MINIMO DE LAS ESTACIONES
+MAXEST   DC    PL2'20'
+MINEST   DC    PL2'1'
 
-VECTOR   DC    PL2'0'
-VECVIS   DC    CL1
+*CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
+CANT     DC    CL2'15'
+CANTPAK  DC    PL2'15'
 
-MAXC     DS    CL2
+*VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
+V_NUMLIN DS    20PL2
+
+*VECTOR DONDE GUARDO SI PASE POR ESA LINEA
+V_VISTO  DS    20CL1
+
+*MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
+MAT      DC    400CL1'0'
 
 DOBLE    DS    FD
 
-WAITECB  DC    F'0'
+***********************************************************************
+*        VARIABLES AGREGADAS PARA LINEAS
+***********************************************************************
+* CONTADORES PARA RECORRER MATRICES
+M_CONT_X DS    PL2
+M_CONT_Y DS    PL2
 
+CONT_LIN DS    PL2
+
+L_LISTA  DS    CL60
+
+         DS    H'74'
+         DS    H'0'
+L_SHOW   DS    CL70'LINEA NN: '
          END
