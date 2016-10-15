@@ -32,9 +32,7 @@ FIN      WTO   '=========>    FIN    <========='
 * Y PIDO CANTIDAD DE ESTACIONES
 * USO R5 PARA INICIAR EL VECTOR
 **********************************************************************
-INICIAR  ZAP   MAXEST,=P'20'
-         ZAP   MINEST,=P'1'
-         BAL   5,INI_VNL
+INICIAR  BAL   5,INI_VNL
          B     CANTEST
          
 **********************************************************************
@@ -99,17 +97,27 @@ RANGO    CP    CANTPAK,MAXEST
          BL    NRANGO
          BR    5
 
-NRANGO   WTO   'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
+NRANGO   MVC   VAL_MSG+44(2),MAXESTC
+         WTO   MF=(E,VAL_MSG-4)
          B     CANTEST
 
 **********************************************************************
 *        INGRESAR TRAMOS
 *        USO R5 Y R6
 **********************************************************************
-TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
+TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',TRAM_XYC,,WAITECB
          WAIT  ECB=WAITECB
-         WTOR  'INGRESE FIN DEL TRAMO',VAL_Y,,WAITECB
+         BAL   6,VALTRAMO
+         CLI   RES_TRC,C'F'
+         BE    TRAMO
+         MVC   VAL_X,TRAM_XYC
+FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',TRAM_XYC,,WAITECB
          WAIT  ECB=WAITECB
+         BAL   6,VALTRAMO
+         CLI   RES_TRC,C'F'
+         BE    FIN_TRAM
+         PACK  DOBLE,TRAM_XYC
+         MVC   VAL_Y,TRAM_XYC
 *        CARGO LA DIR DE LA MATRIZ
          LA    6,MAT
 *        ME MUEVO HASTA LA FILA
@@ -141,6 +149,55 @@ TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',VAL_X,,WAITECB
          AR    6,5
          MVC   0(1,6),=C'1'
          B     MENU
+**********************************************************************
+* SUBRUTINA DE VALIDACION
+* VUELVO CON R6 Y USO R5 PARA LAS OTRAS RUTINAS
+**********************************************************************
+VALTRAMO BAL   5,VALTRNUM
+         CLI   RES_TRC,C'F'
+         BE    VALTRFIN
+         PACK  DOBLE,TRAM_XYC
+         BAL   5,VALRANGT
+VALTRFIN BR    6
+**********************************************************************
+* VALIDO EL TRAMO INICIAL O FINAL
+* VUELVO CON R5
+* USO R7 PARA LA VALIDACION
+**********************************************************************
+VALTRNUM LA    7,TRAM_XYC
+         CLC   0(1,7),=C'0'
+         BL    NVALTR1
+         CLC   0(1,7),=C'9'
+         BH    NVALTR1
+         CLC   1(1,7),=C'0'
+         BL    NVALTR2
+         CLC   1(1,7),=C'9'
+         BH    NVALTR2
+         MVI   RES_TRC,C'T'
+VAL_TRBK BR    5
+         
+NVALTR1  WTO   'NUMERO NO VALIDO'
+         MVI   RES_TRC,C'F'
+         B     VAL_TRBK
+NVALTR2  MVC   1(1,7),0(7)
+         MVI   0(7),C'0'
+         MVI   RES_TRC,C'T'
+         B     VAL_TRBK
+
+**********************************************************************
+* VALIDO EL RANGO DEL TRAMO
+**********************************************************************
+VALRANGT CP    DOBLE,CANTPAK
+         BH    NOVAL_R
+         CP    DOBLE,MINEST
+         BL    NOVAL_R
+         MVI   RES_TRC,C'T'
+FINVALR  BR    5
+
+NOVAL_R  MVC   VAL_MSG+44(2),CANT
+         WTO   MF=(E,VAL_MSG-4)
+         MVI   RES_TRC,C'F'
+         B     FINVALR
 
 **********************************************************************
 *        MUESTRO LINEAS   
@@ -172,22 +229,13 @@ ELEMSIG  MVC   ELEM(20),0(5)
 *        DEFINICION DE VARIABLES
 **********************************************************************
 * MAXIMO Y MINIMO DE LAS ESTACIONES
-MAXEST   DS    PL2
-MINEST   DS    PL2
+MAXESTC  DC    C'20'
+MAXEST   DC    PL2'20'
+MINEST   DC    PL2'1'
 
-*CANTIDAD DE ESTACIONES EN CHAR
+*CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
 CANT     DS    CL2
-
-*CANTIDAD DE ESTACIONES EN EMPAQUETADO
 CANTPAK  DS    PL2
-
-*PARA IMPRIMIR EL TOTAL DE ESTACIONES
-         DC    H'29'
-         DC    H'0'
-TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
-
-*PARA EL WTOR
-WAITECB  DC    F'0'
 
 *PARA LAS OPCIONES DEL MENU
 OPCION   DS    CL1
@@ -208,9 +256,28 @@ DOBLE    DS    FD
 VAL_X    DS    CL2
 VAL_Y    DS    CL2
 
+*VALORES PARA IR MOVIENDOME EN LA MATRIZ
 LONGFILP DC    P'20'
 LONGCOLP DC    P'1'
 
+*VALOR DEL TRAMO PARA VALIDAR
+TRAM_XYC DS    CL2
+
+*RESULTADO DE LA VALIDACION DE TRAMO
+RES_TRC  DS    CL1
+
+*MENSAJE DE VALIDACION
+         DC    H'50'
+         DC    H'0'
+VAL_MSG  DC    C'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
+
+*PARA IMPRIMIR EL TOTAL DE ESTACIONES
+         DC    H'29'
+         DC    H'0'
+TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
+
+*PARA EL WTOR
+WAITECB  DC    F'0'
 
 *SOLO PARA MOSTRAR MATRIZ
 VAL      DS    PL1
