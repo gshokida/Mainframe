@@ -2,7 +2,7 @@
 *INICIO
 **********************************************************************
 TP       SUBENTRY BASES=(3,4)
-         B     INICIAR
+         B     CANTEST *INGRESAR TOTAL DE ESTACIONES
 MENU	 WTO   '--------------      MENU     --------------'
          WTO   '1) INGRESAR TRAMO'
          WTO   '2) VER LINEAS'
@@ -26,14 +26,6 @@ M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 B     MENU
 FIN      WTO   '=========>    FIN    <========='  
          SUBEXIT
-
-**********************************************************************
-* INICIAR VARIABLES
-* Y PIDO CANTIDAD DE ESTACIONES
-* USO R5 PARA INICIAR EL VECTOR
-**********************************************************************
-INICIAR  BAL   5,INI_VNL
-         B     CANTEST
          
 **********************************************************************
 * INICIAR VECTOR CON NUMERO DE LINEAS Y SI SE MOSTRO LA ESTACION
@@ -103,7 +95,7 @@ NRANGO   MVC   VAL_MSG+44(2),MAXESTC
 
 **********************************************************************
 *        INGRESAR TRAMOS
-*        USO R5 Y R6
+*        USO R6 Y R7
 **********************************************************************
 TRAMO    WTOR  'INGRESE INICIO DEL TRAMO',TRAM_XYC,,WAITECB
          WAIT  ECB=WAITECB
@@ -241,10 +233,10 @@ CANTPAK  DS    PL2
 OPCION   DS    CL1
 
 *VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
-V_NUMLIN DS    20PL2
+V_NUMLIN DC    20PL2'0'
 
 *VECTOR DONDE GUARDO SI PASE POR ESA LINEA
-V_VISTO  DS    20PL1
+V_VISTO  DC    20PL1'0'
 
 *MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
 MAT      DC    400CL1'0'
