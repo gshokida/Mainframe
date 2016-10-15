@@ -118,36 +118,14 @@ FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',TRAM_XYC,,WAITECB
          BE    FIN_TRAM
          PACK  DOBLE,TRAM_XYC
          MVC   VAL_Y,TRAM_XYC
-*        CARGO LA DIR DE LA MATRIZ
-         LA    6,MAT
-*        ME MUEVO HASTA LA FILA
-         PACK  DOBLE,VAL_X
-         SP    DOBLE,=P'1'
-         MP    DOBLE,LONGFILP
-         CVB   5,DOBLE
-         AR    6,5
-*        ME MUEVO HASTA LA COLUMNA
-         PACK  DOBLE,VAL_Y
-         SP    DOBLE,=P'1'
-         MP    DOBLE,LONGCOLP
-         CVB   5,DOBLE
-         AR    6,5
-         MVC   0(1,6),=C'1'
-*        CARGO LA DIR DE LA MATRIZ PARA LA PARTE INVERTIDA
-         LA    6,MAT
-*        ME MUEVO HASTA LA FILA
-         PACK  DOBLE,VAL_X
-         SP    DOBLE,=P'1'
-         MP    DOBLE,LONGCOLP
-         CVB   5,DOBLE
-         AR    6,5
-*        ME MUEVO HASTA LA COLUMNA
-         PACK  DOBLE,VAL_Y
-         SP    DOBLE,=P'1'
-         MP    DOBLE,LONGFILP
-         CVB   5,DOBLE
-         AR    6,5
-         MVC   0(1,6),=C'1'
+*        CARGO EN LA MATRIZ CON POS (X,Y)
+         ZAP   LONGFILP,=P'20'
+         ZAP   LONGCOLP,=P'1'
+         BAL   7,MARKMAT
+*        CARGO EN LA MATRIZ CON POS (Y,X) PARA LA PARTE INVERTIDA
+         ZAP   LONGFILP,=P'1'
+         ZAP   LONGCOLP,=P'20'
+         BAL   7,MARKMAT
          B     MENU
 **********************************************************************
 * SUBRUTINA DE VALIDACION
@@ -186,6 +164,7 @@ NVALTR2  MVC   1(1,7),0(7)
 
 **********************************************************************
 * VALIDO EL RANGO DEL TRAMO
+* VUELVO CON R5
 **********************************************************************
 VALRANGT CP    DOBLE,CANTPAK
          BH    NOVAL_R
@@ -199,6 +178,27 @@ NOVAL_R  MVC   VAL_MSG+44(2),CANT
          MVI   RES_TRC,C'F'
          B     FINVALR
 
+**********************************************************************
+* MARCO 1 EN LA MATRIZ EN LAS POSICIONES INDICADAS POR VAL_X Y VAL_Y
+* USO LAS LONGFILP Y LONGCOLP PARA SABER CUANTOS BYTES ME MUEVO
+* VUELVO CON R7
+* USO LOS R5 Y R6 PARA LOS CALCULOS 
+**********************************************************************
+MARKMAT  LA    6,MAT
+*        ME MUEVO HASTA LA FILA
+         PACK  DOBLE,VAL_X
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGFILP
+         CVB   5,DOBLE
+         AR    6,5
+*        ME MUEVO HASTA LA COLUMNA
+         PACK  DOBLE,VAL_Y
+         SP    DOBLE,=P'1'
+         MP    DOBLE,LONGCOLP
+         CVB   5,DOBLE
+         AR    6,5
+         MVC   0(1,6),=C'1'
+         BR    7
 **********************************************************************
 *        MUESTRO LINEAS   
 **********************************************************************
@@ -257,8 +257,8 @@ VAL_X    DS    CL2
 VAL_Y    DS    CL2
 
 *VALORES PARA IR MOVIENDOME EN LA MATRIZ
-LONGFILP DC    P'20'
-LONGCOLP DC    P'1'
+LONGFILP DS    PL2
+LONGCOLP DS    PL2
 
 *VALOR DEL TRAMO PARA VALIDAR
 TRAM_XYC DS    CL2

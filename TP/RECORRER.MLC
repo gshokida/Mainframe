@@ -1,15 +1,20 @@
 RECORRER SUBENTRY BASES=(3)
          WTOR  'INGRESE VALOR MAXIMO',MAXC,,WAITECB
          WAIT  ECB=WAITECB
-         PACK  MAXP,MAXC     
-         CVB   4,MAXP
+         PACK  DOBLE,MAXC     
+         CVB   4,DOBLE
+         
          
          SUBEXIT
 
-MATRIZ   DC    400PL2'0'
+MATRIZ   DC    400CL1'0'
+
+VECTOR   DC    PL2'0'
+VECVIS   DC    CL1
 
 MAXC     DS    CL2
-MAXP     DS    PL2
+
+DOBLE    DS    FD
 
 WAITECB  DC    F'0'
 

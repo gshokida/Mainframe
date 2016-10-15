@@ -5,8 +5,8 @@
 EXAM2    SUBENTRY BASES=(3)
          OPEN  (ARCHIN,(INPUT))
 PROXREG  GET   ARCHIN,REG
-         BAL   4,VALREG
-         CLI   RES,C'V'
+*         BAL   4,VALREG
+*         CLI   RES,C'V'
          BNE   PROXREG
          PACK  DOBLE,COORXC
          SP    DOBLE,=P'1'
@@ -49,8 +49,8 @@ MUEVE    AR    8,9
          BR    5
 ***********************************************************************
 
-VALREG   MVI   RES,C'V'
-         BR    4
+*VALREG   MVI   RES,C'V'
+*         BR    4
 ***********************************************************************
 
 * ESTO REEMPLAZARIA LOS ZAP BAL DEL PROGRAMA PRINCIPAL
@@ -69,7 +69,7 @@ FILENAME DC    C'BOMBAS.DAT',X'00'
 
 TABLERO  DC    2500PL2'0'
 
-REG      DS    0CL5
+REG      DS    0XL5
 COORXC   DS    CL2
 COORYC   DS    CL2
 POTB     DS    X
