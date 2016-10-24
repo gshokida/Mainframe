@@ -1,0 +1,49 @@
+M_LINEA  SUBENTRY BASES=(3)
+         
+* INICIO LOS VALORES PARA RECORRER EL VECTOR DE LINEAS
+         LA    4,V_NUMLIN
+         LA    5,V_VISTO
+         ZAP   CONTPACK,=P'0'
+         ZAP   CONT_LIN,=P'1'
+         CP    0(5),=P'0'
+         BNE   SIGUIENTE
+         
+         ZAP   0(5),=P'1'
+         ZAP   NUM_LIN,0(2,4)
+         LR    6,4
+         LR    7,5
+         LA    6,2(6)
+         LA    7,1(7)
+         
+         
+         
+         
+SIG_LIN  AP    CONTPACK,=P'1'
+         CP    CONTPACK,CANTPAK
+         BNE   OTRA_LIN
+         
+         SUBEXIT
+
+*CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
+CANT     DC    CL2'15'
+CANTPAK  DC    PL2'15'
+
+*VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
+V_NUMLIN DS    20PL2
+
+*VECTOR DONDE GUARDO SI PASE POR ESA LINEA
+V_VISTO  DS    20CL1
+
+CONTPACK DS    PL2
+
+CONT_LIN DS    PL2
+
+L_LISTA  DS    CL60
+
+         DS    H'74'
+         DS    H'0'
+L_SHOW   DS    CL70'LINEA NN: '
+
+NUM_LIN  DS    PL2
+
+         END
