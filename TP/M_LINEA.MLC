@@ -1,5 +1,5 @@
 M_LINEA  SUBENTRY BASES=(3)
-         
+         BAL   4,INICIAR
 * INICIO LOS VALORES PARA RECORRER EL VECTOR DE LINEAS
          LA    4,V_NUMLIN * ME GUARDO EL VECTOR
          LA    5,20 *20 VUELTAS SI ALGUNA ES 00 TERMINE 
@@ -28,21 +28,37 @@ SIG_REC  LA    7,5(7)
          B     OTRO_REC
          UNPK  NUM_LINC,CONT_LIN * CARGO NUMERO DE LINEA
          MVZ   NUM_LINC+1(1),=X'FF'
-         MVC   L_SHOW+6(2),NUM_LINC
+         MVC   L_SHOW+6(2),NUM_LINC * ARMO EL STRING PARA MOSTRAR
          MVC   L_SHOW+10(60),L_LISTA
 MUESTRO  WTO   MF=(E,L_SHOW-4)
-         AP    CONT_LIN,=P'1'
+         AP    CONT_LIN,=P'1' * SUMO UNO AL CONTADOR DE LINEAS
 * REINICIAR L_LINEA
          MVC   L_LISTA(30),=C'                              '
          MVC   L_LISTA+30(30),=C'                              '
          B     ADELANTO
+
+INICIAR  LA    5,V_NUMLIN
+         LA    6,20
+         ZAP   CONT_LIN,=P'1'
+OTRALIN  UNPK  NUM_LINC,CONT_LIN
+         MVZ   NUM_LINC+1(1),=X'FF'
+         MVC   NUMVEST,NUM_LINC
+         MVC   NUMLIN,=C'00'
+         MVC   VISTO,=C'0'
+         MVC   0(5,5),VECREG
+         LA    5,5(5)
+         AP    CONT_LIN,=P'1'
+         BCT   6,OTRALIN
+         BR    4
+
+
 
 *CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
 CANT     DC    CL2'15'
 CANTPAK  DC    PL2'15'
 
 *VECTOR DONDE GUARDO SI PASE POR ESA LINEA
-V_NUMLIN DS    20CL3
+V_NUMLIN DS    20CL5
 
 VECREG   DS    0CL5
 NUMVEST  DS    CL2
