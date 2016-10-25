@@ -1,38 +1,42 @@
 M_LINEA  SUBENTRY BASES=(3)
          
 * INICIO LOS VALORES PARA RECORRER EL VECTOR DE LINEAS
-         LA    4,V_NUMLIN
-         LA    5,V_VISTO
-         ZAP   CONTPACK,=P'0'
-         ZAP   CONT_LIN,=P'1'
-         CP    0(5),=P'0'
-         BNE   SIGUIENTE
+         LA    4,V_NUMLIN * ME GUARDO EL VECTOR
+         LA    5,20 *20 VUELTAS SI ALGUNA ES 00 TERMINE 
+         ZAP   CONT_LIN,=P'1' * CONTADOR DE LINEAS
+         CLI   0(2,4),C'00'
+         BE    FIN
+         LA    6,L_LISTA * LISTA PARA IR AGREGANDO LAS ESTACIONES
+         MVC   VECREG,0(4) * GUARDO EL ELEMENTO EN VECREG
+         CLI   VISTO,C'1'
+         BE    ADELANTO
          
-         ZAP   0(5),=P'1'
-         ZAP   NUM_LIN,0(2,4)
-         LR    6,4
+         
+ADELANTO LA    4,3(4)
+         BCT   5,SIGUIENTE
+         
+FIN      WTO   'TERMINE LA RUTINA'
+         SUBEXIT
+
+RECORRER LR    6,4
          LR    7,5
          LA    6,2(6)
          LA    7,1(7)
          
-         
-         
-         
-SIG_LIN  AP    CONTPACK,=P'1'
-         CP    CONTPACK,CANTPAK
-         BNE   OTRA_LIN
-         
-         SUBEXIT
+         BR    8
+
+
 
 *CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
 CANT     DC    CL2'15'
 CANTPAK  DC    PL2'15'
 
-*VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
-V_NUMLIN DS    20PL2
-
 *VECTOR DONDE GUARDO SI PASE POR ESA LINEA
-V_VISTO  DS    20CL1
+V_NUMLIN DS    20CL3
+
+VECREG   DS    0CL3
+NUMLIN   DS    CL2
+VISTO    DS    CL1
 
 CONTPACK DS    PL2
 
