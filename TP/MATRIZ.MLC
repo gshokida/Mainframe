@@ -1,4 +1,6 @@
 MATRIZ   SUBENTRY BASES=(3,4)
+         BAL   5,HARDCOD1
+         BAL   5,MOSTRARM
          B     FILL_VEC
 R_LINEA  WTO   'RECORRER VECTOR LINEAS'
 MENU     WTO   'FIN'
@@ -20,10 +22,11 @@ SIG_EL_M CLI   0(5),C'1' * SI EN LA MATRIZ VALE 1 LLAMO A UPD_LIN
          BE    UPD_LIN
          LA    5,1(5) * AVANZO EN LA MATRIZ
          LA    8,5(8) * AVANZO EN EL VECTOR AUX PARA UPD_LIN
-         AP    CONT_MAT,=P'1'
-         CP    CONT_MAT,=P'21'
+*         AP    CONT_MAT,=P'1'
+         CP    CONT_MAT,=P'20'
          BL    SIG_EL_M * SI NO LLEGUE A LOS 21 SIGO POR LA MISA FILA
 BACK_UPD ZAP   CONT_MAT,=P'0'
+         AP    CONT_LIN,=P'1'
          LA    8,V_NUMLIN * INICIO EL VECTOR AUX
          LA    7,5(7) * AVANZO EN EL VECTOR DE LINEAS
          BCT   6,SIG_COLM * HAGO ESTO 20 VECES
@@ -33,9 +36,7 @@ FILL_LIN UNPK  NUM_LINC,CONT_LIN
          MVZ   NUM_LINC+1(1),=X'FF'
          MVC   2(2,7),NUM_LINC
 
-UPD_LIN  WTO   'HACER UPDATE DE LINEAS'
-* EN LA POS 2(2,7) TENGO EL CALOR DE LA LINEA
-         CLC   2(2,8),=C'00' * SI ES 00 LE PONGO EL VALOR DE LINEA
+UPD_LIN  CLC   2(2,8),=C'00' * SI ES 00 LE PONGO EL VALOR DE LINEA
          BE    UPD_EQ
          CLC   2(2,8),2(7) * SI SON IGUALES NO HAGO NADA
          BE    UPD_FIN
@@ -53,6 +54,36 @@ UPD_FIN  B     BACK_UPD
 
 UPD_EQ   MVC   2(2,8),2(7)
          B     UPD_FIN
+
+**********************************************************************
+*        HARDCODE MATRIZ PARA PROBAR LA RUTINA
+**********************************************************************
+HARDCOD1 LA    6,MAT
+         LA    7,20
+INIHARD1 MVC   0(1,6),=C'1'
+         LA    6,1(6)
+         BCT   7,INIHARD1
+         
+         LA    6,MAT
+         LA    7,20
+INIHARD2 MVC   0(1,6),=C'1'
+         LA    6,20(6)
+         BCT   7,INIHARD2
+         BR    5
+
+**********************************************************************
+*        MUESTRO MATRIZ
+**********************************************************************
+MOSTRARM WTO   '-------------------------------------------'
+         LA    6,20
+         LA    5,MAT
+ELEMSIG  MVC   ELEM(20),0(5)
+         WTO   MF=(E,ELEM-4)
+         LA    5,20(5)
+         BCT   6,ELEMSIG
+         WTO   '-------------------------------------------'
+         BR    5
+
 **********************************************************************
 *        DEFINICION DE VARIABLES
 **********************************************************************
@@ -121,6 +152,13 @@ L_LISTA  DS    CL60
 L_SHOW   DC    CL69'LINEA NN: '
 
 NUM_LINC DS    CL2
+
+*SOLO PARA MOSTRAR MATRIZ
+VAL      DS    PL1
+
+         DC    H'24'
+         DC    H'0'
+ELEM     DS    CL20
 
 * VARIABLES PARA RECORRER MATRIZ Y ARMAR EL VECTOR
 CONT_MAT DS    PL2
