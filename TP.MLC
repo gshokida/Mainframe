@@ -32,18 +32,19 @@ FIN      WTO   '=========>    FIN    <========='
 * VUELVO CON R5
 * USO R6 PARA LA DIRECCION Y R7 PARA CICLAR
 **********************************************************************
-* CARGO LA MATRIZ DE NUMERO DE LINEA
-INI_VNL  LA    6,V_NUMLIN 
-         LA    7,20
-V_NL     ZAP   0(2,6),=P'0'
-         LA    6,2(6)
-         BCT   7,V_NL
-* CARGO LA MATRIZ DE VISTA
-INI_VVI  LA    6,V_VISTO
-         LA    7,20
-V_VIS    ZAP   0(1,6),=P'0'
-         LA    6,1(6)
-         BCT   7,V_VIS
+INI_VNL  LA    7,V_NUMLIN
+         LA    6,20
+         ZAP   CONT_LIN,=P'1'
+OTRALIN  UNPK  NUM_LINC,CONT_LIN
+         MVZ   NUM_LINC+1(1),=X'FF'
+         MVC   NUMVEST,NUM_LINC
+         MVC   NUMLIN,=C'00'
+         MVC   VISTO,=C'0'
+         MVC   0(5,7),VECREG
+         LA    7,5(7)
+         AP    CONT_LIN,=P'1'
+         BCT   6,OTRALIN
+         MVC   0(5,7),=C'21000'
          BR    5
 
 **********************************************************************
@@ -119,6 +120,7 @@ FIN_TRAM WTOR  'INGRESE FIN DEL TRAMO',TRAM_XYC,,WAITECB
          ZAP   LONGCOLP,=P'20'
          BAL   7,MARKMAT
          B     MENU
+         
 **********************************************************************
 * SUBRUTINA DE VALIDACION
 * VUELVO CON R6 Y USO R5 PARA LAS OTRAS RUTINAS
@@ -129,6 +131,7 @@ VALTRAMO BAL   5,VALTRNUM
          PACK  DOBLE,TRAM_XYC
          BAL   5,VALRANGT
 VALTRFIN BR    6
+
 **********************************************************************
 * VALIDO EL TRAMO INICIAL O FINAL
 * VUELVO CON R5
@@ -191,11 +194,56 @@ MARKMAT  LA    6,MAT
          AR    6,5
          MVC   0(1,6),=C'1'
          BR    7
+         
 **********************************************************************
 *        MUESTRO LINEAS   
 **********************************************************************
-LINEAS   WTO   'MUESTRO LINEAS'
+LINEAS   BAL   5,INI_VNL
+         WTO   'MUESTRO LINEAS'
+* DEBERIA COMPLETAR EL VECTOR DE LINEAS CON LOS DATOS DE LA MATRIZ
+         B     R_LINEA
+
+**********************************************************************
+*RECORRO EL VECTOR Y POR CADA ELEMENTO NO VISTO EJECUTO S_LINEA
+**********************************************************************
+R_LINEA  LA    5,V_NUMLIN * ME GUARDO EL VECTOR
+         LA    7,20 *20 VUELTAS SI ALGUNA ES 00 TERMINE 
+         ZAP   CONT_LIN,=P'1' * CONTADOR DE LINEAS
+O_REGIS  CLC   2(2,5),=C'00'
+         BE    MENU
+         LA    6,L_LISTA * LISTA PARA IR AGREGANDO LAS ESTACIONES
+         MVC   VECREG,0(5) * GUARDO EL ELEMENTO EN VECREG
+         CLI   VISTO,C'1'
+         BE    N_REGIS
+         B     S_LINEA
+N_REGIS  LA    5,5(5)
+         BCT   7,O_REGIS
          B     MENU
+
+**********************************************************************
+*        RECORRO EL VECTOR Y MUESTRO LAS LINEAS DE UN ELEMENTO  
+**********************************************************************
+S_LINEA  LR    8,5
+OTRO_REC CLC   2(2,8),=C'00'
+         BE    MUESTROL *SI ES 00 TERMINO DE RECORRER
+         CLC   2(2,8),NUMLIN * SI ES IGUAL A LA LINEA ANTERIOR
+         BNE   SIG_RECL
+         MVC   4(1,8),=C'1' * MARCO EL VISTO
+         MVC   0(1,6),=C','
+         MVC   1(2,6),0(8) * MUEVO EL NUM DE ESTACION
+         LA    6,3(6) * ADELANTO LA LINEA DONDE CARGO
+SIG_RECL LA    8,5(8)
+         B     OTRO_REC
+MUESTROL UNPK  NUM_LINC,CONT_LIN * CARGO NUMERO DE LINEA
+         MVZ   NUM_LINC+1(1),=X'FF'
+         MVC   L_SHOW+6(2),NUM_LINC * ARMO EL STRING PARA MOSTRAR
+         MVC   L_SHOW+10(59),L_LISTA+1
+         WTO   MF=(E,L_SHOW-4)
+         AP    CONT_LIN,=P'1' * SUMO UNO AL CONTADOR DE LINEAS
+*        REINICIAR L_LINEA
+         MVC   L_LISTA(30),=C'                              '
+         MVC   L_LISTA+30(30),=C'                              '
+         B     N_REGIS
 
 **********************************************************************
 *        MUESTRO CANTIDAD DE ESTACIONES   
@@ -233,10 +281,8 @@ CANTPAK  DS    PL2
 OPCION   DS    CL1
 
 *VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
-V_NUMLIN DC    20PL2'0'
-
 *VECTOR DONDE GUARDO SI PASE POR ESA LINEA
-V_VISTO  DC    20PL1'0'
+V_NUMLIN DS    21CL5
 
 *MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
 MAT      DC    400CL1'0'
@@ -270,6 +316,23 @@ TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
 
 *PARA EL WTOR
 WAITECB  DC    F'0'
+
+* REGISTRO PARA USAR EN EL VECTOR
+VECREG   DS    0CL5
+NUMVEST  DS    CL2
+NUMLIN   DS    CL2
+VISTO    DS    CL1
+
+*VARIABLES PARA RECORRER EL VECTOR DE LINEAS
+CONT_LIN DS    PL2
+
+L_LISTA  DS    CL60
+
+         DC    H'73'
+         DC    H'0'
+L_SHOW   DC    CL69'LINEA NN: '
+
+NUM_LINC DS    CL2
 
 *SOLO PARA MOSTRAR MATRIZ
 VAL      DS    PL1
