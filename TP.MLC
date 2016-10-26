@@ -271,6 +271,8 @@ N_REGIS  LA    5,5(5)
 *        RECORRO EL VECTOR Y MUESTRO LAS LINEAS DE UN ELEMENTO  
 **********************************************************************
 S_LINEA  LR    8,5
+         MVC   L_LISTA(30),=C'                              '
+         MVC   L_LISTA+30(30),=C'                              '
 OTRO_REC CLC   2(2,8),=C'00'
          BE    MUESTROL *SI ES 00 TERMINO DE RECORRER
          CLC   2(2,8),NUMLIN * SI ES IGUAL A LA LINEA ANTERIOR

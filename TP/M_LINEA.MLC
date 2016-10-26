@@ -19,6 +19,8 @@ FIN      WTO   'TERMINE LA RUTINA'
          SUBEXIT
 
 RECORRER LR    7,4
+         MVC   L_LISTA(30),=C'                              '
+         MVC   L_LISTA+30(30),=C'                              '
 OTRO_REC CLC   2(2,7),=C'00'
          BE    MUESTRO *SI ES 00 TERMINO DE RECORRER
          CLC   2(2,7),NUMLIN * SI ES IGUAL A LA LINEA ANTERIOR

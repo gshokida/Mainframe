@@ -1,8 +1,10 @@
 MATRIZ   SUBENTRY BASES=(3,4)
+         BAL   5,INICIAR
          BAL   5,HARDCOD1
          BAL   5,MOSTRARM
          B     FILL_VEC
 R_LINEA  WTO   'RECORRER VECTOR LINEAS'
+         BAL   5,MOSTRARV
 MENU     WTO   'FIN'
          SUBEXIT
 
@@ -76,28 +78,49 @@ INIHARD2 MVC   0(1,6),=C'1'
 **********************************************************************
 MOSTRARM WTO   '-------------------------------------------'
          LA    6,20
-         LA    5,MAT
-ELEMSIG  MVC   ELEM(20),0(5)
+         LA    7,MAT
+ELEMSIG  MVC   ELEM(20),0(7)
          WTO   MF=(E,ELEM-4)
-         LA    5,20(5)
+         LA    7,20(7)
          BCT   6,ELEMSIG
          WTO   '-------------------------------------------'
          BR    5
 
 **********************************************************************
+*        MUESTRO VECTOR
+**********************************************************************
+MOSTRARV WTO   '-------------------------------------------'
+         LA    6,20
+         LA    7,V_NUMLIN
+ELEMSIGV MVC   ELEM_VEC(5),0(7)
+         WTO   MF=(E,ELEM_VEC-4)
+         LA    7,5(7)
+         BCT   6,ELEMSIGV
+         WTO   '-------------------------------------------'
+         BR    5
+
+INICIAR  LA    7,V_NUMLIN
+         LA    6,20
+         ZAP   CONT_LIN,=P'1'
+OTRALIN  UNPK  NUM_LINC,CONT_LIN
+         MVZ   NUM_LINC+1(1),=X'FF'
+         MVC   NUMVEST,NUM_LINC
+         MVC   NUMLIN,=C'00'
+         MVC   VISTO,=C'0'
+         MVC   0(5,7),VECREG
+         LA    7,5(7)
+         AP    CONT_LIN,=P'1'
+         BCT   6,OTRALIN
+         MVC   0(5,7),=C'21000'
+         BR    5
+
+**********************************************************************
 *        DEFINICION DE VARIABLES
 **********************************************************************
-* MAXIMO Y MINIMO DE LAS ESTACIONES
-MAXESTC  DC    C'20'
-MAXEST   DC    PL2'20'
-MINEST   DC    PL2'1'
 
 *CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
 CANT     DS    CL2
 CANTPAK  DS    PL2
-
-*PARA LAS OPCIONES DEL MENU
-OPCION   DS    CL1
 
 *VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
 *VECTOR DONDE GUARDO SI PASE POR ESA LINEA
@@ -105,33 +128,6 @@ V_NUMLIN DS    21CL5
 
 *MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
 MAT      DC    400CL1'0'
-
-*PARA CONVERTIR EN EMPAQUETADO
-DOBLE    DS    FD
-
-*PARA INGRESAR LOS TRAMOS ESTACION INICIAL Y FINAL
-VAL_X    DS    CL2
-VAL_Y    DS    CL2
-
-*VALORES PARA IR MOVIENDOME EN LA MATRIZ
-LONGFILP DS    PL2
-LONGCOLP DS    PL2
-
-*VALOR DEL TRAMO PARA VALIDAR
-TRAM_XYC DS    CL2
-
-*RESULTADO DE LA VALIDACION DE TRAMO
-RES_TRC  DS    CL1
-
-*MENSAJE DE VALIDACION
-         DC    H'50'
-         DC    H'0'
-VAL_MSG  DC    C'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
-
-*PARA IMPRIMIR EL TOTAL DE ESTACIONES
-         DC    H'29'
-         DC    H'0'
-TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
 
 *PARA EL WTOR
 WAITECB  DC    F'0'
@@ -163,5 +159,9 @@ ELEM     DS    CL20
 * VARIABLES PARA RECORRER MATRIZ Y ARMAR EL VECTOR
 CONT_MAT DS    PL2
 AUX_VEC  DS    PL2
+
+         DC    H'9'
+         DC    H'0'
+ELEM_VEC DS    CL5
 
          END
