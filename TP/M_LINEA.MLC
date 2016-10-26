@@ -55,7 +55,7 @@ INICIAR  LA    5,V_NUMLIN
 OTRALIN  UNPK  NUM_LINC,CONT_LIN
          MVZ   NUM_LINC+1(1),=X'FF'
          MVC   NUMVEST,NUM_LINC
-         MVC   NUMLIN,=C'01'
+         MVC   NUMLIN,=C'00'
          MVC   VISTO,=C'0'
          MVC   0(5,5),VECREG
          LA    5,5(5)
