@@ -1,6 +1,6 @@
 MATRIZ   SUBENTRY BASES=(3,4)
          BAL   5,INICIAR
-         BAL   5,HARDCOD1
+         BAL   5,HARDCOD2
          BAL   5,MOSTRARM
          B     FILL_VEC
 R_LINEA  WTO   'RECORRER VECTOR LINEAS'
@@ -68,9 +68,20 @@ INIHARD1 MVC   0(1,6),=C'1'
          
          LA    6,MAT
          LA    7,20
-INIHARD2 MVC   0(1,6),=C'1'
+SIGHARD1 MVC   0(1,6),=C'1'
          LA    6,20(6)
-         BCT   7,INIHARD2
+         BCT   7,SIGHARD1
+         BR    5
+
+**********************************************************************
+*        HARDCODE MATRIZ PARA PROBAR LA RUTINA
+**********************************************************************
+HARDCOD2 LA    6,MAT
+         LA    6,1(6)
+         MVC   0(1,6),=C'1'
+         LA    6,MAT
+         LA    6,20(6)
+         MVC   0(1,6),=C'1'
          BR    5
 
 **********************************************************************
