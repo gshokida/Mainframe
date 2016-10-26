@@ -36,7 +36,8 @@ BACK_UPD ZAP   CONT_MAT,=P'0'
 FILL_LIN UNPK  NUM_LINC,CONT_LIN
          MVZ   NUM_LINC+1(1),=X'FF'
          MVC   2(2,7),NUM_LINC
-
+         B     SIG_EL_M
+         
 UPD_LIN  CLC   2(2,8),=C'00' * SI ES 00 LE PONGO EL VALOR DE LINEA
          BE    UPD_EQ
          CLC   2(2,8),2(7) * SI SON IGUALES NO HAGO NADA
