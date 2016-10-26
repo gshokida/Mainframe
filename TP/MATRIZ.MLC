@@ -1,0 +1,108 @@
+MATRIZ   SUBENTRY BASES=(3,4)
+         B     FILL_VEC
+R_LINEA  WTO   'RECORRER VECTOR LINEAS'
+MENU     WTO   'FIN'
+         SUBEXIT
+
+**********************************************************************
+*        RECORRO LA MATRIZ Y ARMO EL VECTOR DE REGISTROS
+**********************************************************************
+FILL_VEC LA    5,MAT
+         LA    7,V_NUMLIN
+         LA    6,20
+         ZAP   CONT_LIN,=P'1'
+         ZAP   CONT_MAT,=P'0'
+SIG_COLM AP    CONT_MAT,=P'1'
+         CLC   2(2,7),=C'00'
+         BE    FILL_LIN
+SIG_EL_M CLI   0(5),C'1'
+         BE    UPD_LIN
+         LA    5,1(5)
+         AP    CONT_MAT,=P'1'
+         CP    CONT_MAT,=P'21'
+         BNE   SIG_EL_M
+BACK_UPD ZAP   CONT_MAT,=P'0'
+         LA    7,5(7)
+         BCT   6,SIG_COLM
+         B     R_LINEA
+
+FILL_LIN UNPK  NUM_LINC,CONT_LIN
+         MVZ   NUM_LINC+1(1),=X'FF'
+         MVC   2(2,7),NUM_LINC
+
+UPD_LIN  WTO   'HACER UPDATE DE LINEAS'
+         B     BACK_UPD
+
+**********************************************************************
+*        DEFINICION DE VARIABLES
+**********************************************************************
+* MAXIMO Y MINIMO DE LAS ESTACIONES
+MAXESTC  DC    C'20'
+MAXEST   DC    PL2'20'
+MINEST   DC    PL2'1'
+
+*CANTIDAD DE ESTACIONES EN CHAR Y EMPAQUETADO
+CANT     DS    CL2
+CANTPAK  DS    PL2
+
+*PARA LAS OPCIONES DEL MENU
+OPCION   DS    CL1
+
+*VECTOR DONDE ALMACENO LA LINEA A LA HORA DE MOSTRARLA
+*VECTOR DONDE GUARDO SI PASE POR ESA LINEA
+V_NUMLIN DS    21CL5
+
+*MATRIZ DONDE GUARDO LAS RELACIONES DE LAS ESTACIONES
+MAT      DC    400CL1'0'
+
+*PARA CONVERTIR EN EMPAQUETADO
+DOBLE    DS    FD
+
+*PARA INGRESAR LOS TRAMOS ESTACION INICIAL Y FINAL
+VAL_X    DS    CL2
+VAL_Y    DS    CL2
+
+*VALORES PARA IR MOVIENDOME EN LA MATRIZ
+LONGFILP DS    PL2
+LONGCOLP DS    PL2
+
+*VALOR DEL TRAMO PARA VALIDAR
+TRAM_XYC DS    CL2
+
+*RESULTADO DE LA VALIDACION DE TRAMO
+RES_TRC  DS    CL1
+
+*MENSAJE DE VALIDACION
+         DC    H'50'
+         DC    H'0'
+VAL_MSG  DC    C'EL VALOR INGRESADO ESTA FUERA DEL RANGO 1 A 20'
+
+*PARA IMPRIMIR EL TOTAL DE ESTACIONES
+         DC    H'29'
+         DC    H'0'
+TOTESTA  DC    CL25'TOTAL DE ESTACIONES: '
+
+*PARA EL WTOR
+WAITECB  DC    F'0'
+
+* REGISTRO PARA USAR EN EL VECTOR
+VECREG   DS    0CL5
+NUMVEST  DS    CL2
+NUMLIN   DS    CL2
+VISTO    DS    CL1
+
+*VARIABLES PARA RECORRER EL VECTOR DE LINEAS
+CONT_LIN DS    PL2
+
+L_LISTA  DS    CL60
+
+         DC    H'73'
+         DC    H'0'
+L_SHOW   DC    CL69'LINEA NN: '
+
+NUM_LINC DS    CL2
+
+* VARIABLES PARA RECORRER MATRIZ Y ARMAR EL VECTOR
+CONT_MAT DS    PL2
+         
+         END
