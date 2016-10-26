@@ -217,7 +217,6 @@ SIG_EL_M CLI   0(5),C'1' * SI EN LA MATRIZ VALE 1 LLAMO A UPD_LIN
          BE    UPD_LIN
          LA    5,1(5) * AVANZO EN LA MATRIZ
          LA    8,5(8) * AVANZO EN EL VECTOR AUX PARA UPD_LIN
-*         AP    CONT_MAT,=P'1'
          CP    CONT_MAT,=P'20'
          BL    SIG_EL_M * SI NO LLEGUE A LOS 21 SIGO POR LA MISA FILA
 BACK_UPD ZAP   CONT_MAT,=P'0'
@@ -254,7 +253,8 @@ UPD_EQ   MVC   2(2,8),2(7)
 *RECORRO EL VECTOR Y POR CADA ELEMENTO NO VISTO EJECUTO S_LINEA
 **********************************************************************
 R_LINEA  LA    5,V_NUMLIN * ME GUARDO EL VECTOR
-         LA    7,20 *20 VUELTAS SI ALGUNA ES 00 TERMINE 
+*         LA    7,20 *20 VUELTAS SI ALGUNA ES 00 TERMINE 
+         ZAP   AUX_VEC,=P'0'
          ZAP   CONT_LIN,=P'1' * CONTADOR DE LINEAS
 O_REGIS  CLC   2(2,5),=C'00'
          BE    MENU
@@ -264,7 +264,9 @@ O_REGIS  CLC   2(2,5),=C'00'
          BE    N_REGIS
          B     S_LINEA
 N_REGIS  LA    5,5(5)
-         BCT   7,O_REGIS
+*         BCT   7,O_REGIS
+         CP    AUX_VEC,CANTPAK
+         BL    O_REGIS
          B     MENU
 
 **********************************************************************
@@ -282,7 +284,11 @@ OTRO_REC CLC   2(2,8),=C'00'
          MVC   1(2,6),0(8) * MUEVO EL NUM DE ESTACION
          LA    6,3(6) * ADELANTO LA LINEA DONDE CARGO
 SIG_RECL LA    8,5(8)
+         AP    AUX_VEC,=P'1'
+         CP    AUX_VEC,CANTPAK
+         BE    MUESTROL
          B     OTRO_REC
+         
 MUESTROL UNPK  NUM_LINC,CONT_LIN * CARGO NUMERO DE LINEA
          MVZ   NUM_LINC+1(1),=X'FF'
          MVC   L_SHOW+6(2),NUM_LINC * ARMO EL STRING PARA MOSTRAR
