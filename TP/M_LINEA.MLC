@@ -33,7 +33,7 @@ OTRO_REC CLC   2(2,7),=C'00'
          MVC   1(2,6),0(7) * MUEVO EL NUM DE ESTACION
          LA    6,3(6) * ADELANTO LA LINEA DONDE CARGO
 SIG_REC  LA    7,5(7)
-         AP    AUX_VEC,=P'1'
+*         AP    AUX_VEC,=P'1'
          CP    AUX_VEC,CANTPAK
          BE    MUESTRO
          B     OTRO_REC
