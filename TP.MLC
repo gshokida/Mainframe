@@ -8,7 +8,6 @@ MENU	 WTO   '--------------      MENU     --------------'
          WTO   '2) VER LINEAS'
          WTO   '3) VER CANTIDAD DE ESTACIONES'
          WTO   '4) SALIR'
-         WTO   '5) MUESTRO MATRIZ'
          WTO   '-------------------------------------------'
 M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 WAIT  ECB=WAITECB 
@@ -20,8 +19,6 @@ M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 BE    VEREST *VER ESTACIONES
 		 CLI   OPCION,C'4'
 		 BE    FIN
-		 CLI   OPCION,C'5'
-		 BE    MOSTRARM
 		 WTO   'OPCION NO VALIDA'
 		 B     MENU
 FIN      WTO   '=========>    FIN    <========='  
@@ -265,7 +262,6 @@ O_REGIS  CLC   2(2,5),=C'00'
          BE    N_REGIS
          B     S_LINEA
 N_REGIS  LA    5,5(5)
-*         BCT   7,O_REGIS
          CP    AUX_VEC,CANTPAK
          BL    O_REGIS
          B     MENU
@@ -306,19 +302,6 @@ MUESTROL UNPK  NUM_LINC,CONT_LIN * CARGO NUMERO DE LINEA
 **********************************************************************
 VEREST   MVC   TOTESTA+21(2),CANT
          WTO   MF=(E,TOTESTA-4)
-         B     MENU
-
-**********************************************************************
-*        MUESTRO MATRIZ
-**********************************************************************
-MOSTRARM WTO   '-------------------------------------------'
-         LA    6,20
-         LA    5,MAT
-ELEMSIG  MVC   ELEM(20),0(5)
-         WTO   MF=(E,ELEM-4)
-         LA    5,20(5)
-         BCT   6,ELEMSIG
-         WTO   '-------------------------------------------'
          B     MENU
          
 **********************************************************************
@@ -393,12 +376,5 @@ L_LISTA  DS    CL60
 L_SHOW   DC    CL69'LINEA NN: '
 
 NUM_LINC DS    CL2
-
-*SOLO PARA MOSTRAR MATRIZ
-VAL      DS    PL1
-
-         DC    H'24'
-         DC    H'0'
-ELEM     DS    CL20
 
          END
