@@ -1,7 +1,7 @@
 **********************************************************************
 *INICIO
 **********************************************************************
-TP       SUBENTRY BASES=(3,4)
+TPV2     SUBENTRY BASES=(3,4)
          B     CANTEST *INGRESAR TOTAL DE ESTACIONES
 MENU	 WTO   '--------------      MENU     --------------'
          WTO   '1) INGRESAR TRAMO'
@@ -17,6 +17,8 @@ M_OPC    WTOR  'SELECCIONAR OPCION [1-4]',OPCION,,WAITECB
 		 BE    LINEAS *VER LINEAS
 		 CLI   OPCION,C'3'
 		 BE    VEREST *VER ESTACIONES
+		 CLI   OPCION,C'5'
+		 BE    MOSTRARM *VER ESTACIONES
 		 CLI   OPCION,C'4'
 		 BE    FIN
 		 WTO   'OPCION NO VALIDA'
@@ -220,7 +222,8 @@ BACK_UPD LA    5,1(5) * AVANZO EN LA MATRIZ
          AP    CONT_LIN,=P'1'
          LA    8,V_NUMLIN * INICIO EL VECTOR AUX
          LA    7,5(7) * AVANZO EN EL VECTOR DE LINEAS
-         BCT   6,SIG_COLM * HAGO ESTO 20 VECES
+         B     MOSTRARV
+MOSVBAC  BCT   6,SIG_COLM * HAGO ESTO 20 VECES
          B     R_LINEA
 
 FILL_LIN UNPK  NUM_LINC,CONT_LIN
@@ -265,6 +268,8 @@ O_REGIS  CLC   2(2,5),=C'00'
 N_REGIS  LA    5,5(5)
          CP    AUX_VEC,CANTPAK
          BL    O_REGIS
+         
+*  B     MOSTRARV *MUESTRO EL VECTOR APRA PROBAR
          B     MENU
 
 **********************************************************************
@@ -304,7 +309,34 @@ MUESTROL UNPK  NUM_LINC,CONT_LIN * CARGO NUMERO DE LINEA
 VEREST   MVC   TOTESTA+21(2),CANT
          WTO   MF=(E,TOTESTA-4)
          B     MENU
-         
+
+**********************************************************************
+*        MUESTRO MATRIZ
+**********************************************************************
+MOSTRARM WTO   '-------------------------------------------'
+         LA    6,20
+         LA    7,MAT
+ELEMSIG  MVC   ELEM(20),0(7)
+         WTO   MF=(E,ELEM-4)
+         LA    7,20(7)
+         BCT   6,ELEMSIG
+         WTO   '-------------------------------------------'
+         B     MENU
+
+**********************************************************************
+*        MUESTRO VECTOR
+**********************************************************************
+
+MOSTRARV WTO   '-------------------------------------------'
+         LA    10,21
+         LA    11,V_NUMLIN
+ELEMVSIG MVC   ELEMVEC(5),0(11)
+         WTO   MF=(E,ELEMVEC-4)
+         LA    11,5(11)
+         BCT   10,ELEMVSIG
+         WTO   '-------------------------------------------'
+         B     MOSVBAC
+		 
 **********************************************************************
 *        DEFINICION DE VARIABLES
 **********************************************************************
@@ -379,4 +411,12 @@ L_SHOW   DC    CL69'LINEA NN: '
 NUM_LINC DS    CL2
 
 ELEM_AUX DS    CL2
+
+         DC    H'24'
+         DC    H'0'
+ELEM     DS    CL20
+
+         DC    H'9'
+         DC    H'0'
+ELEMVEC  DS    CL5
          END
