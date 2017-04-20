@@ -1,0 +1,78 @@
+PLAYFAIR SUBENTRY BASES=(3,4)
+         WTO   '=========>    INICIO    <========='
+		 B     INICIAR
+         
+FIN      WTO   '=========>    FIN    <========='  
+
+         SUBEXIT
+
+*  INICIO LAS VARIABLES NECESARIAS (REGISTROS 5, 6, 7, 8 Y 9)
+INICIAR  LA    5,MATRIZ
+         LA    6,25
+OTROCHAR WTOR  'INGRESE UNA LETRA',CHAR,,WAITECB
+		 WAIT  ECB=WAITECB
+		 BAL   7,VAL_CHAR
+		 CLI   VALID,C'F'
+		 BE    OTROCHAR
+		 BAL   7,FINDCHAR
+		 CLI   EXISTE,C'T'
+		 BE    OTROCHAR
+         MVC   0(1,5),CHAR
+         BAL   12,S_MATRIZ
+         LA    5,1(5)
+         BCT   6,OTROCHAR
+         B     FIN
+         
+*  VALIDO SI EL CHAR ES UNA LETRA MAYUSCULA Y NO ES J
+VAL_CHAR CLI   CHAR,C'J'
+         BE    NV_CHAR
+         CLI   CHAR,C'A'
+         BL    NV_CHAR
+         CLI   CHAR,C'Z'
+         BH    NV_CHAR
+         MVC   VALID,=C'T'
+F_V_CHAR BR    7
+
+NV_CHAR  MVC   VALID,=C'F'
+         B     F_V_CHAR
+         
+*  VERIFICAR SI EXISTE EL CHAR A INGRESAR
+FINDCHAR LA    9,25
+         MVC   EXISTE,=C'F'
+         LA    8,MATRIZ
+NXT_FIND CLC   0(1,8),CHAR
+         BE    FIND_T
+         LA    8,1(8)
+         BCT   9,NXT_FIND
+F_F_CHAR BR    7
+
+FIND_T   MVC   EXISTE,=C'T'
+         WTO   'LA LETRA YA FUE AGREGADA ANTERIORMENTE'
+         B     F_F_CHAR
+
+*  MOSTRAR MATRIZ (REGISTRO 10 Y 11, VUELVO REGISTRO 12)
+S_MATRIZ LA    10,MATRIZ
+         LA    11,5
+         WTO   '---------------------------------------------------'
+SIG_MAT  MVC   VER_MAT(5),0(10)
+         WTO   MF=(E,VER_MAT-4)
+         LA    10,5(10)
+         BCT   11,SIG_MAT
+         WTO   '---------------------------------------------------'
+         BR    12
+         
+*  VARIABLES
+CHAR     DS    CL1
+
+WAITECB  DC    F'0'
+
+MATRIZ   DS    25CL1
+
+WTOBLOCK DC    H'9'
+         DC    H'0'
+VER_MAT  DS    CL5
+
+EXISTE   DS    CL1
+VALID    DS    CL1
+
+         END

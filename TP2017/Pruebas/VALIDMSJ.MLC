@@ -1,0 +1,27 @@
+VALIDMSJ SUBENTRY BASES=(3)
+         WTOR  'INGRESE UN MENSAJE',MSJ,,WAITECB
+         WAIT  ECB=WAITECB
+         B     VAL_MSJ
+FIN      WTO   'THE END'
+         SUBEXIT
+         
+VAL_MSJ  LA    5,10
+         LA    6,MSJ
+NXT_MSJ  MVC   DUPLA(2),0(6)
+         WTO   MF=(E,DUPLA-4)
+         LA    6,2(6)
+         BCT   5,NXT_MSJ
+         B     FIN
+
+         
+WAITECB  DC    F'0'
+
+MSJ      DS    CL20
+
+MSJ_VAL  DS    CL1
+         
+         DS    H'6'
+         DS    H'0'
+DUPLA    DS    CL2
+
+         END
