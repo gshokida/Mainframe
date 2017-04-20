@@ -1,0 +1,107 @@
+PLAYFAIR SUBENTRY BASES=(3,4)
+         WTO   '=========>    INICIO    <========='
+*		 B     INICIAR
+         B     HARDCODE
+MSJ      B     S_MSJ
+MENU     B     S_MENU
+         
+FIN      WTO   '=========>    FIN    <========='  
+
+         SUBEXIT
+
+*  INICIO LAS VARIABLES NECESARIAS (REGISTROS 5 Y 6)
+INICIAR  LA    5,MATRIZ
+         LA    6,25
+OTROCHAR WTOR  'INGRESE UNA LETRA',CHAR,,WAITECB
+		 WAIT  ECB=WAITECB
+		 
+         MVC   0(1,5),CHAR
+         LA    5,1(5)
+         BCT   6,OTROCHAR
+         B     MSJ
+
+*  MUESTRO INGRESAR MENSAJE
+S_MSJ    WTOR  'INGRESE EL MENSAJE (LONG: 20)',STR_MSJ,,WAITECB
+		 WAIT  ECB=WAITECB
+* TODO: VALIDAR MENSAJE INGRESADO
+         B     MENU
+
+*  MUESTRO EL MENU
+S_MENU   WTO   '---------------------------------'
+         WTO   '---------      MENU     ---------'
+         WTO   '---------------------------------'
+         WTO   '1) CAMBIAR MENSAJE'
+         WTO   '2) MOSTRAR MENSAJE'
+         WTO   '3) CODIFICAR MENSAJE'
+         WTO   '4) DECODIFICAR MENSAJE'
+         WTO   '5) VER MATRIZ'
+         WTO   '6) SALIR' 
+         WTOR  'SELECCIONAR OPCION [1-6]',OPCION,,WAITECB
+		 WAIT  ECB=WAITECB 
+         CLC   OPCION,=C'1'
+		 BE    MSJ
+		 CLC   OPCION,=C'2'
+		 BE    VER_MSJ
+		 CLC   OPCION,=C'3'
+		 BE    MENU
+		 CLC   OPCION,=C'4'
+		 BE    MENU
+		 CLC   OPCION,=C'5'
+		 BE    VER_MATR
+		 CLC   OPCION,=C'6'
+		 BE    FIN
+		 WTO   'OPCION NO VALIDA'
+		 B     MENU
+
+*  VER MENSAJE
+VER_MSJ  WTO   MF=(E,STR_MSJ-4)
+         B     MENU
+         
+* VER MATRIZ
+VER_MATR BAL   12,S_MATRIZ
+         B     MENU
+         
+* MOSTRAR MATRIZ (REGISTRO 10 Y 11, VUELVO REGISTRO 12)
+S_MATRIZ LA    10,MATRIZ
+         LA    11,5
+         WTO   '---------------------------------------------------'
+SIG_MAT  MVC   VER_MAT(5),0(10)
+         WTO   MF=(E,VER_MAT-4)
+         LA    10,5(10)
+         BCT   11,SIG_MAT
+         WTO   '---------------------------------------------------'
+         BR    12
+         
+* PARA BORRAR
+* HARDCODEAR MATRIZ
+HARDCODE LA    5,MATRIZ
+         LA    6,25
+         LA    7,MAT_HARD
+SIG_HARD MVC   0(1,5),0(7)
+         LA    7,1(7)
+         LA    5,1(5)
+         BCT   6,SIG_HARD
+         B     MSJ
+
+MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+
+*  VARIABLES
+OPCION   DS    CL1
+
+CHAR     DS    CL1
+
+WAITECB  DC    F'0'
+
+         DC    H'24'
+         DC    H'0'
+STR_MSJ  DS    CL20
+
+MATRIZ   DS    25CL1
+
+WTOBLOCK DC    H'9'
+         DC    H'0'
+VER_MAT  DS    CL5
+
+EXISTE   DS    CL1
+
+         END
