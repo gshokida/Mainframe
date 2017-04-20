@@ -47,10 +47,8 @@ NV_CHARJ WTO   'NO SE PUEDE INGRESAR LA LETRA J'
 NV_CHAR  MVC   VALID,=C'F'
          B     F_V_CHAR
          
-         
 CHAR     DS    CL1
 VALID    DS    CL1
-         
          
 WAITECB  DC    F'0'
 

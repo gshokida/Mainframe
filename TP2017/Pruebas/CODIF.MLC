@@ -1,0 +1,90 @@
+CODIF    SUBENTRY BASES=(3,4)
+         B     HARDCODE
+MSJ      B     S_MSJ
+COD      B     ENCODE
+FIN      WTO   'FIN'
+         SUBEXIT
+         
+*  REALIZAR LA CODIFICACION DEL MENSAJE
+ENCODE   LA    5,10
+         LA    6,STR_MSJ
+         LA    7,AUX_MSJ
+S_ENCODE MVC   DUPLA(2),0(6)
+         B     DO_ENC
+         MVC   0(2,7),0(6)
+         LA    7,2(7)
+         LA    6,2(6)
+         BCT   5,S_ENCODE
+         B     FIN
+       
+DO_ENC   CLI   DUPLA(1),C' '
+         BE    F_DO_ENC
+         CLI   DUPLA+1(1),C' '
+         BE    F_DO_ENC
+         MVC   AUX_CHAR(1),DUPLA(1)
+         BAL   12,BUSCAR
+         ZAP   FIL_1,AUX_FIL
+         ZAP   COL_1,AUX_COL
+         MVC   AUX_CHAR(1),DUPLA+1(1)
+         BAL   12,BUSCAR
+         ZAP   FIL_2,AUX_FIL
+         ZAP   COL_2,AUX_COL
+* TODO: REALIZAR EL CAMBIO 
+FIN_ENC  B     FIN
+
+BUSCAR   LA    8,25
+         LA    9,MATRIZ
+         ZAP   AUX_FIL,=P'0'
+         ZAP   AUX_COL,=P'0'
+S_BUSCAR 
+* TODO: FALTA LA LOGICA QUE CARGA LOS DATOS DE AUX_FIL Y AUX_COL
+         LA    9,1(9)
+         BCT   8,S_BUSCAR
+         BR    12
+         
+F_DO_ENC MVC   AUXDUPLA(2),DUPLA
+         B     FIN_ENC
+*  MUESTRO INGRESAR MENSAJE
+S_MSJ    WTOR  'INGRESE EL MENSAJE (LONG: 20)',STR_MSJ,,WAITECB
+		 WAIT  ECB=WAITECB
+         B     COD
+         
+* HARDCODEAR MATRIZ
+HARDCODE LA    5,MATRIZ
+         LA    6,25
+         LA    7,MAT_HARD
+SIG_HARD MVC   0(1,5),0(7)
+         LA    7,1(7)
+         LA    5,1(5)
+         BCT   6,SIG_HARD
+         B     MSJ
+
+MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+ 
+WAITECB  DC    F'0'
+         
+         DC    H'24'
+         DC    H'0'
+STR_MSJ  DS    CL20
+
+MATRIZ   DS    25CL1
+
+WTOBLOCK DC    H'9'
+         DC    H'0'
+VER_MAT  DS    CL5
+
+DUPLA    DS    CL2
+         
+FIL_1    DS    PL1
+FIL_2    DS    PL1
+COL_1    DS    PL1
+COL_2    DS    PL1
+
+AUX_FIL  DS    PL1
+AUX_COL  DS    PL1
+
+AUX_CHAR DS    CL1
+AUXDUPLA DS    CL2
+AUX_MSJ  DS    CL20
+
+         END
