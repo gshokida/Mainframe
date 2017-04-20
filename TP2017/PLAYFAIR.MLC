@@ -57,8 +57,38 @@ FIND_T   MVC   EXISTE,=C'T'
 *  MUESTRO INGRESAR MENSAJE
 S_MSJ    WTOR  'INGRESE EL MENSAJE (LONG: 20)',STR_MSJ,,WAITECB
 		 WAIT  ECB=WAITECB
-* TODO: VALIDAR MENSAJE INGRESADO
+         B     VAL_MSJ
+S_MSJVAL CLI   MSJ_VAL,C'F'
+         BE    S_MSJ
          B     MENU
+
+*  VALIDAR MENSAJE
+VAL_MSJ  LA    5,20
+         LA    6,STR_MSJ
+N_MSJ_CH MVC   CHAR(1),0(6)
+         CLI   CHAR,C' '
+         BE    S_MSJ_CH
+         BAL   7,VAL_CHAR
+         CLI   VALID,C'F'
+         BE    N_V_DUP
+S_MSJ_CH LA    6,1(6)
+         BCT   5,N_MSJ_CH
+         LA    5,10
+         LA    6,STR_MSJ
+NXT_MSJ  MVC   DUPLA(2),0(6)
+         CLC   DUPLA,=C'  '
+         BE    NEXT_DUP
+         CLC   DUPLA(1),1(6)
+         BE    N_V_DUP
+NEXT_DUP LA    6,2(6)
+         BCT   5,NXT_MSJ
+         MVC   MSJ_VAL,=C'T'
+         WTO   'VALIDO'
+F_V_DUPL B     S_MSJVAL
+
+N_V_DUP  MVC   MSJ_VAL,=C'F'
+         WTO   'NO VALIDO'
+         B     F_V_DUPL
 
 *  MUESTRO EL MENU
 S_MENU   WTO   '---------------------------------'
@@ -138,5 +168,9 @@ VER_MAT  DS    CL5
 
 EXISTE   DS    CL1
 VALID    DS    CL1
+
+MSJ_VAL  DS    CL1
+
+DUPLA    DS    CL2
 
          END

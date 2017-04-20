@@ -5,14 +5,52 @@ VALIDMSJ SUBENTRY BASES=(3)
 FIN      WTO   'THE END'
          SUBEXIT
          
-VAL_MSJ  LA    5,10
+VAL_MSJ  LA    5,20
+         LA    6,MSJ
+N_MSJ_CH MVC   CHAR(1),0(6)
+         CLI   CHAR,C' '
+         BE    S_MSJ_CH
+         BAL   7,VAL_CHAR
+         CLI   VALID,C'F'
+         BE    N_V_DUP
+S_MSJ_CH LA    6,1(6)
+         BCT   5,N_MSJ_CH
+         LA    5,10
          LA    6,MSJ
 NXT_MSJ  MVC   DUPLA(2),0(6)
-         WTO   MF=(E,DUPLA-4)
-         LA    6,2(6)
+         CLC   DUPLA,=C'  '
+         BE    NEXT_DUP
+         CLC   DUPLA(1),1(6)
+         BE    N_V_DUP
+NEXT_DUP LA    6,2(6)
          BCT   5,NXT_MSJ
-         B     FIN
+         WTO   'VALIDO'
+F_V_DUPL B     FIN
 
+N_V_DUP  MVC   MSJ_VAL,=C'F'
+         WTO   'NO VALIDO'
+         B     F_V_DUPL
+
+*  VALIDO SI EL CHAR ES UNA LETRA MAYUSCULA Y NO ES J
+VAL_CHAR CLI   CHAR,C'J'
+         BE    NV_CHARJ
+         CLI   CHAR,C' '
+         BE    
+         CLI   CHAR,C'A'
+         BL    NV_CHAR
+         CLI   CHAR,C'Z'
+         BH    NV_CHAR
+CHARESP  MVC   VALID,=C'T'
+F_V_CHAR BR    7
+
+NV_CHARJ WTO   'NO SE PUEDE INGRESAR LA LETRA J'
+NV_CHAR  MVC   VALID,=C'F'
+         B     F_V_CHAR
+         
+         
+CHAR     DS    CL1
+VALID    DS    CL1
+         
          
 WAITECB  DC    F'0'
 
@@ -20,8 +58,8 @@ MSJ      DS    CL20
 
 MSJ_VAL  DS    CL1
          
-         DS    H'6'
-         DS    H'0'
+         DC    H'6'
+         DC    H'0'
 DUPLA    DS    CL2
 
          END
