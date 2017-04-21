@@ -1,31 +1,44 @@
-CODIF    SUBENTRY BASES=(3,4)
+FILACOL  SUBENTRY BASES=(3,4)
          B     HARDCODE
 MSJ      B     S_MSJ
 COD      B     ENCODE
-FIN      WTO   'FIN'
+         
+FIN      WTO   'FILA 1:'
+         UNPK  STR_FC,FIL_1
+         MVZ   STR_FC+1(1),=X'FF'
+         WTO   MF=(E,STR_FC-4)
+         
+         WTO   'COLUMNA 1:'
+         UNPK  STR_FC,COL_1
+         MVZ   STR_FC+1(1),=X'FF'
+         WTO   MF=(E,STR_FC-4)
+         
+         WTO   'FILA 2:'
+         UNPK  STR_FC,FIL_2
+         MVZ   STR_FC+1(1),=X'FF'
+         WTO   MF=(E,STR_FC-4)
+         
+         WTO   'COLUMNA 2:'
+         UNPK  STR_FC,COL_2
+         MVZ   STR_FC+1(1),=X'FF'
+         WTO   MF=(E,STR_FC-4)
+         
+         WTO   'FIN'
          SUBEXIT
          
 *  REALIZAR LA CODIFICACION DEL MENSAJE
-ENCODE   LA    5,10
-         LA    6,STR_MSJ
-         LA    7,AUX_MSJ
-S_ENCODE MVC   DUPLA(2),0(6)
-         B     DO_ENC
-         MVC   0(2,7),0(6)
-         LA    7,2(7)
-         LA    6,2(6)
-         BCT   5,S_ENCODE
-         B     FIN
-       
-DO_ENC   CLI   DUPLA(1),C' '
+ENCODE   MVC   DUPLA(2),STR_MSJ
+         WTO   'LARALA'
+         WTO   MF=(E,DUPLA-4)
+DO_ENC   CLC   DUPLA(1),=C' '
          BE    F_DO_ENC
-         CLI   DUPLA+1(1),C' '
+         CLC   DUPLA+1(1),=C' '
          BE    F_DO_ENC
-         MVC   AUX_CHAR(1),DUPLA(1)
+         MVC   AUX_CHAR(1),DUPLA
          BAL   12,BUSCAR
          ZAP   FIL_1,AUX_FIL
          ZAP   COL_1,AUX_COL
-         MVC   AUX_CHAR(1),DUPLA+1(1)
+         MVC   AUX_CHAR(1),DUPLA+1
          BAL   12,BUSCAR
          ZAP   FIL_2,AUX_FIL
          ZAP   COL_2,AUX_COL
@@ -38,7 +51,6 @@ BUSCAR   LA    8,25
          ZAP   AUX_COL,=P'0'
 S_BUSCAR CLC   AUX_CHAR,0(9)
          BE    F_BUSCAR
-* TODO: FALTA LA LOGICA QUE CARGA LOS DATOS DE AUX_FIL Y AUX_COL
          AP    AUX_COL,=P'1'
          CP    AUX_COL,=P'5'
          BE    FILCOL
@@ -53,7 +65,7 @@ FILCOL   ZAP   AUX_COL,=P'0'
          AP    AUX_FIL,=P'1'
          B     S_FILCOL
 *  MUESTRO INGRESAR MENSAJE
-S_MSJ    WTOR  'INGRESE EL MENSAJE (LONG: 20)',STR_MSJ,,WAITECB
+S_MSJ    WTOR  'INGRESAR DUPLA DE LETRAS',STR_MSJ,,WAITECB
 		 WAIT  ECB=WAITECB
          B     COD
          
@@ -68,12 +80,13 @@ SIG_HARD MVC   0(1,5),0(7)
          B     MSJ
 
 MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
- 
+
+*  VAIREBALES
 WAITECB  DC    F'0'
          
-         DC    H'24'
+         DC    H'6'
          DC    H'0'
-STR_MSJ  DS    CL20
+STR_MSJ  DS    CL2
 
 MATRIZ   DS    25CL1
 
@@ -81,6 +94,8 @@ WTOBLOCK DC    H'9'
          DC    H'0'
 VER_MAT  DS    CL5
 
+         DC    H'6'
+         DC    H'0'
 DUPLA    DS    CL2
          
 FIL_1    DS    PL1
@@ -94,5 +109,9 @@ AUX_COL  DS    PL1
 AUX_CHAR DS    CL1
 AUXDUPLA DS    CL2
 AUX_MSJ  DS    CL20
+
+         DC    H'6'
+         DC    H'0'
+STR_FC   DS    CL2
 
          END
