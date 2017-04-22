@@ -1,0 +1,57 @@
+OBT_LET  SUBENTRY BASES=(3,4)
+         B     HARDCODE
+BACK     ZAP   AUX_COL,=P'2'
+         ZAP   AUX_FIL,=P'3'
+         BAL   8,GETLETRA
+         WTO   MF=(E,AUX_CHAR-4)
+         WTO   'FIN'
+         SUBEXIT
+         
+***********************************************************************
+* RUTINA QUE RECIBE AUX_COL Y AUX_FIL Y DEVUELVE LA LETRA EN ESA 
+* POSICION EN LA MATRIZ Y SE LA LLAMA CON EL REGISTRO 8
+* LO DEJA EN AUX_CHAR
+***********************************************************************
+GETLETRA ZAP   AUX_POS,=P'0'
+         ZAP   POS_MAT,=P'-1'
+         LA    9,MATRIZ
+         ZAP   AUX_POS,AUX_FIL
+         MP    AUX_POS,=P'5'
+         AP    AUX_POS,AUX_COL
+S_GETLTR MVC   AUX_CHAR(1),0(9)
+         LA    9,1(9)
+         AP    POS_MAT,=P'1'
+         CP    POS_MAT,AUX_POS
+         BNE   S_GETLTR
+F_GETLTR BR    8
+
+***********************************************************************
+***********************************************************************
+
+
+* HARDCODEAR MATRIZ
+HARDCODE LA    5,MATRIZ
+         LA    6,25
+         LA    7,MAT_HARD
+SIG_HARD MVC   0(1,5),0(7)
+         LA    7,1(7)
+         LA    5,1(5)
+         BCT   6,SIG_HARD
+         B     BACK
+
+MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+         
+         
+MATRIZ   DS    25CL1
+
+AUX_FIL  DS    PL1
+AUX_COL  DS    PL1
+
+         DC    H'5'
+         DC    H'0'
+AUX_CHAR DS    CL1
+
+AUX_POS  DS    PL2
+POS_MAT  DS    PL2
+
+         END
