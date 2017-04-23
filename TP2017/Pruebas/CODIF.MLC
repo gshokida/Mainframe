@@ -11,28 +11,28 @@ ENCODE   LA    5,10
          LA    7,AUX_MSJ
 S_ENCODE MVC   DUPLA(2),0(6)
          B     DO_ENC
-S_DO_ENC MVC   0(2,7),AUXDUPLA
+S_DO_ENC MVC   0(2,7),0(6)
          LA    7,2(7)
          LA    6,2(6)
          BCT   5,S_ENCODE
          B     FIN
        
-DO_ENC   CLI   DUPLA(1),C' '
+DO_ENC   CLC   DUPLA(1),=C' '
          BE    F_DO_ENC
-         CLI   DUPLA+1(1),C' '
+         CLC   DUPLA+1(1),=C' '
          BE    F_DO_ENC
-         MVC   AUX_CHAR(1),DUPLA(1)
-         BAL   12,BUSCARFL
+         MVC   AUX_CHAR(1),DUPLA
+         BAL   12,BUSCAR
          ZAP   FIL_1,AUX_FIL
          ZAP   COL_1,AUX_COL
-         MVC   AUX_CHAR(1),DUPLA+1(1)
-         BAL   12,BUSCARFL
+         MVC   AUX_CHAR(1),DUPLA+1
+         BAL   12,BUSCAR
          ZAP   FIL_2,AUX_FIL
          ZAP   COL_2,AUX_COL
 * TODO: REALIZAR EL CAMBIO 
 FIN_ENC  B     S_DO_ENC
 
-BUSCARFL LA    8,25
+BUSCAR   LA    8,25
          LA    9,MATRIZ
          ZAP   AUX_FIL,=P'0'
          ZAP   AUX_COL,=P'0'
