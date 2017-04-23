@@ -1,24 +1,35 @@
 SWITCH   SUBENTRY BASES=(3,4)
          B     HARDCODE
          
-         ZAP   FIL_1,=P'1'
-         ZAP   COL_1,=P'1'
-         ZAP   FIL_2,=P'3'
-         ZAP   COL_2,=P'3'
+BACK     ZAP   FIL_1,=P'0'
+         ZAP   COL_1,=P'0'
+         ZAP   FIL_2,=P'4'
+         ZAP   COL_2,=P'4'
          
-BACK     ZAP   AUX_COL,=P'1'
-         ZAP   AUX_FIL,=P'1'
+         ZAP   AUX_COL,=P'0'
+         ZAP   AUX_FIL,=P'0'
          BAL   8,GETLETRA
          WTO   MF=(E,AUX_CHAR-4)
          
-         ZAP   AUX_COL,=P'3'
-         ZAP   AUX_FIL,=P'3'
+         ZAP   AUX_COL,=P'4'
+         ZAP   AUX_FIL,=P'4'
          BAL   8,GETLETRA
          WTO   MF=(E,AUX_CHAR-4)
          
          B     SWITCH_
          
 FIN      WTO   MF=(E,AUXDUPLA-4)
+
+         WTO   'VUELTA'
+         
+         ZAP   FIL_1,=P'0'
+         ZAP   COL_1,=P'4'
+         ZAP   FIL_2,=P'4'
+         ZAP   COL_2,=P'0'
+         
+         B     SWITCH_2
+         
+FIN2     WTO   MF=(E,AUXDUPLA-4)
          WTO   'FIN'
          SUBEXIT
          
@@ -35,6 +46,18 @@ SWITCH_  ZAP   AUX_FIL,FIL_1
          MVC   AUXDUPLA+1(1),AUX_CHAR
          B     FIN
          
+*  HACER EL CAMBIO CRUZADO
+SWITCH_2 ZAP   AUX_FIL,FIL_1
+         ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         WTO   MF=(E,AUX_CHAR-4)
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_FIL,FIL_2
+         ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         WTO   MF=(E,AUX_CHAR-4)
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN2
 ***********************************************************************
 * RUTINA QUE RECIBE AUX_COL Y AUX_FIL Y DEVUELVE LA LETRA EN ESA 
 * POSICION EN LA MATRIZ Y SE LA LLAMA CON EL REGISTRO 8
