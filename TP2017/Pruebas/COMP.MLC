@@ -1,0 +1,19 @@
+COMP     SUBENTRY BASES=(3,4)
+         WTOR  'INGRESE DOS CARACTERES',STR_MSJ,,WAITECB
+         WAIT  ECB=WAITECB
+         
+         LA    5,STR_MSJ
+         CLC   0(1,5),1(5)
+         BE    IGUALES
+         WTO   'SON DISTINTOS'
+         B     FIN
+IGUALES  WTO   'SON IGUALES'
+
+FIN      WTO   'FIN'
+         SUBEXIT
+         
+WAITECB  DC    F'0'
+
+STR_MSJ  DS    CL2
+
+         END

@@ -1,0 +1,68 @@
+LONGITUD SUBENTRY BASES=(3,4)
+
+         BAL   5,ING_MSJ
+         BAL   5,GETLONG
+         
+         UNPK  STRLONG,LONG
+         MVZ   STRLONG+1(1),=X'FF'
+         
+         WTO   'LA LONGITUD ES: '
+         WTO   MF=(E,STRLONG-4)
+         
+         WTO   'FIN'
+         
+         SUBEXIT
+         
+ING_MSJ  WTOR  'INGRESAR MENSAJE:',STR_MSJ,,WAITECB
+         WAIT  ECB=WAITECB
+         BR    5
+         
+         
+*  OBTENER LONGITUD DEL MENSAJE
+GETLONG  LA    6,20
+         LA    8,STR_MSJ
+         ZAP   LONG,=P'0'
+BGETLONG MVC   CHAR(1),0(8)
+         WTO   MF=(E,CHAR-4)
+         CLC   CHAR,=C' '
+         BE    SGETLONG
+         BAL   7,VAL_CHAR
+         CLC   VALID,=C'F'
+         BE    FGETLONG
+SGETLONG LA    8,1(8)
+         AP    LONG,=P'1'
+         BCT   6,BGETLONG
+FGETLONG BR    5
+
+         
+*  VALIDO SI EL CHAR ES UNA LETRA MAYUSCULA Y NO ES J
+VAL_CHAR CLI   CHAR,C'J'
+         BE    NV_CHAR
+         CLI   CHAR,C'A'
+         BL    NV_CHAR
+         CLI   CHAR,C'Z'
+         BH    NV_CHAR
+         MVC   VALID,=C'T'
+F_V_CHAR BR    7
+
+NV_CHAR  MVC   VALID,=C'F'
+         B     F_V_CHAR
+         
+         
+WAITECB  DC    F'0'
+         
+STR_MSJ  DS    CL20
+         
+LONG     DS    PL2
+
+         DC    H'6'
+         DC    H'0'
+STRLONG  DS    CL2
+         
+         DC    H'5'
+         DC    H'0'
+CHAR     DS    CL1
+
+VALID    DS    CL1
+
+         END

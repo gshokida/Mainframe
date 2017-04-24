@@ -1,0 +1,190 @@
+XCHANGE  SUBENTRY BASES=(3)
+         B     HARDCODE
+         
+MSJ      ZAP   FIL_1,=P'0'
+         ZAP   COL_1,=P'0'
+         ZAP   FIL_2,=P'4'
+         ZAP   COL_2,=P'4'
+
+         B     EXCHANGE
+         
+FIN_ENC  WTO   'AUXDUPLA: '
+         WTO   MF=(E,AUXDUPLA-4)
+         
+         WTO   'FIN'
+
+         SUBEXIT
+         
+*  REALIZAR LA CODIFICACION
+EXCHANGE CP    FIL_1,FIL_2
+         BNE   NE_FIL
+         B     XCHG_DER *FILAS = Y COLUMNAS != VALIDADO ANTERIORMENTE
+NE_FIL   CP    COL_1,COL_2
+         BE    NE_COL
+         B     SWITCH * FILAS Y COLUMNAS SON DISTINTAS
+NE_COL   B     XCHG_ABJ *FILAS DISTINTAS Y COLUMNAS IGUALES HACIA ABAJO
+         
+*  HACER EL CAMBIO A DERECHA
+XCHG_DER ZAP   AUX_COL,=P'0'
+         CP    COL_1,=P'4'
+         BE    X_DER_C1
+         ZAP   AUX_COL,COL_1
+         AP    AUX_COL,=P'1'
+X_DER_C1 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         
+         ZAP   AUX_COL,=P'0'
+         CP    COL_2,=P'4'
+         BE    X_DER_C2
+         ZAP   AUX_COL,COL_2
+         AP    AUX_COL,=P'1'
+X_DER_C2 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         
+         B     FIN_ENC
+         
+*  HACER EL CAMBIO ABAJO
+XCHG_ABJ ZAP   AUX_FIL,=P'0'
+         CP    FIL_1,=P'4'
+         BE    X_ABJ_F1
+         ZAP   AUX_FIL,FIL_1
+         AP    AUX_FIL,=P'1'
+X_ABJ_F1 ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         
+         ZAP   AUX_COL,=P'0'
+         CP    FIL_2,=P'4'
+         BE    X_ABJ_F2
+         ZAP   AUX_FIL,FIL_2
+         AP    AUX_FIL,=P'1'
+X_ABJ_F2 ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+
+*  HACER EL CAMBIO CRUZADO
+SWITCH   ZAP   AUX_FIL,FIL_1
+         ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_FIL,FIL_2
+         ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+         
+*  HACER EL CAMBIO A IZQUIERDA
+XCHG_IZQ ZAP   AUX_COL,=P'4'
+         CP    COL_1,=P'0'
+         BE    X_IZQ_C1
+         ZAP   AUX_COL,COL_1
+         SP    AUX_COL,=P'1'
+X_IZQ_C1 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         
+         ZAP   AUX_COL,=P'4'
+         CP    COL_2,=P'0'
+         BE    X_IZQ_C2
+         ZAP   AUX_COL,COL_2
+         SP    AUX_COL,=P'1'
+X_IZQ_C2 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         
+         B     FIN_ENC
+         
+*  HACER EL CAMBIO ARRIBA
+XCHG_ARR ZAP   AUX_FIL,=P'4'
+         CP    FIL_1,=P'0'
+         BE    X_ARR_F1
+         ZAP   AUX_FIL,FIL_1
+         SP    AUX_FIL,=P'1'
+X_ARR_F1 ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         
+         ZAP   AUX_COL,=P'4'
+         CP    FIL_2,=P'0'
+         BE    X_ARR_F2
+         ZAP   AUX_FIL,FIL_2
+         SP    AUX_FIL,=P'1'
+X_ARR_F2 ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+         
+         
+***********************************************************************
+* RUTINA QUE RECIBE AUX_COL Y AUX_FIL Y DEVUELVE LA LETRA EN ESA 
+* POSICION EN LA MATRIZ Y SE LA LLAMA CON EL REGISTRO 8
+* LO DEJA EN AUX_CHAR
+***********************************************************************
+GETLETRA ZAP   AUX_POS,=P'0'
+         ZAP   POS_MAT,=P'-1'
+         LA    9,MATRIZ
+         ZAP   AUX_POS,AUX_FIL
+         MP    AUX_POS,=P'5'
+         AP    AUX_POS,AUX_COL
+S_GETLTR MVC   AUX_CHAR(1),0(9)
+         LA    9,1(9)
+         AP    POS_MAT,=P'1'
+         CP    POS_MAT,AUX_POS
+         BNE   S_GETLTR
+F_GETLTR BR    8
+
+
+* HARDCODEAR MATRIZ
+HARDCODE LA    5,MATRIZ
+         LA    6,25
+         LA    7,MAT_HARD
+SIG_HARD MVC   0(1,5),0(7)
+         LA    7,1(7)
+         LA    5,1(5)
+         BCT   6,SIG_HARD
+         B     MSJ
+         
+         
+MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+ 
+WAITECB  DC    F'0'
+         
+         DC    H'24'
+         DC    H'0'
+STR_MSJ  DS    CL20
+
+MATRIZ   DS    25CL1
+
+WTOBLOCK DC    H'9'
+         DC    H'0'
+VER_MAT  DS    CL5
+
+         DC    H'6'
+         DC    H'0'
+DUPLA    DS    CL2
+         
+FIL_1    DS    PL1
+FIL_2    DS    PL1
+COL_1    DS    PL1
+COL_2    DS    PL1
+
+AUX_FIL  DS    PL1
+AUX_COL  DS    PL1
+
+AUX_CHAR DS    CL1
+         
+         DC    H'6'
+         DC    H'0'
+AUXDUPLA DS    CL2
+
+         DC    H'24'
+         DC    H'0'
+AUX_MSJ  DS    CL20
+
+AUX_POS  DS    PL2
+POS_MAT  DS    PL2
+
+         END
