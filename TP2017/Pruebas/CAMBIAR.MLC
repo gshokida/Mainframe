@@ -58,8 +58,8 @@ EXCHANGE CP    FIL_1,FIL_2
          BNE   NE_FIL
          B     XCHG_DER *FILAS = Y COLUMNAS != VALIDADO ANTERIORMENTE
 NE_FIL   CP    COL_1,COL_2
-         BNE   NE_COL
-         B     SWITCH * FILAS Y COLUMNAS SON DISTINTAS
+         BE    NE_COL
+         BAL   11,SWITCH * FILAS Y COLUMNAS SON DISTINTAS
 NE_COL   B     XCHG_ABJ *FILAS DISTINTAS Y COLUMNAS IGUALES HACIA ABAJO
          
 *  HACER EL CAMBIO A DERECHA
@@ -112,7 +112,7 @@ SWITCH   ZAP   AUX_FIL,FIL_1
          ZAP   AUX_COL,COL_1
          BAL   8,GETLETRA
          MVC   AUXDUPLA+1(1),AUX_CHAR
-         B     FIN_ENC
+         BR    11
          
 *  HACER EL CAMBIO A IZQUIERDA
 XCHG_IZQ ZAP   AUX_COL,=P'4'
@@ -196,8 +196,6 @@ MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
  
 WAITECB  DC    F'0'
          
-         DC    H'24'
-         DC    H'0'
 STR_MSJ  DS    CL20
 
 MATRIZ   DS    25CL1
@@ -217,8 +215,9 @@ AUX_FIL  DS    PL1
 AUX_COL  DS    PL1
 
 AUX_CHAR DS    CL1
+         
 AUXDUPLA DS    CL2
-
+         
          DC    H'24'
          DC    H'0'
 AUX_MSJ  DS    CL20
