@@ -118,7 +118,7 @@ S_MENU   WTO   '------------------------------------------------------'
 		 CLC   OPCION,=C'3'
 		 BE    ENCODE
 		 CLC   OPCION,=C'4'
-		 BE    MENU
+		 BE    DECODE
 		 CLC   OPCION,=C'5'
 		 BE    VER_MATR
 		 CLC   OPCION,=C'6'
@@ -178,7 +178,8 @@ S_DO_ENC MVC   0(2,7),AUXDUPLA
          LA    7,2(7)
          LA    6,2(6)
          BCT   5,S_ENCRYP
-         B     FIN
+         WTO   MF=(E,AUX_MSJ-4)
+         B     MENU
 
 *  DE UNA DUPLA OBTENGO OTRA DUPLA CON EL ALGORITMO SELECCIONADO
 DO_ENC   CLC   DUPLA(1),=C' '
@@ -274,7 +275,6 @@ X_IZQ_C1 ZAP   AUX_FIL,FIL_1
 X_IZQ_C2 ZAP   AUX_FIL,FIL_1
          BAL   8,GETLETRA
          MVC   AUXDUPLA+1(1),AUX_CHAR
-         
          B     FIN_ENC
          
 *  HACER EL CAMBIO ARRIBA
