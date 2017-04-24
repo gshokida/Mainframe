@@ -3,8 +3,7 @@ PLAYFAIR SUBENTRY BASES=(3,4)
          B     HARDCODE
 MSJ      B     S_MSJ
 MENU     B     S_MENU
-FIN      WTO   'FIN'  
-
+FIN      WTO   'FIN'
          SUBEXIT
 
 ***********************************************************************
@@ -88,11 +87,11 @@ NXT_MSJ  MVC   DUPLA(2),0(6)
 NEXT_DUP LA    6,2(6)
          BCT   5,NXT_MSJ
          MVC   MSJ_VAL,=C'T'
-         WTO   'VALIDO'
+         WTO   'MENSAJE INGRESADO'
 F_V_DUPL B     S_MSJVAL
 
 N_V_DUP  MVC   MSJ_VAL,=C'F'
-         WTO   'NO VALIDO'
+         WTO   'MENSAJE NO VALIDO'
          B     F_V_DUPL
 ***********************************************************************
 ***********************************************************************
@@ -101,9 +100,9 @@ N_V_DUP  MVC   MSJ_VAL,=C'F'
 ***********************************************************************
 * MUESTRO EL MENU
 ***********************************************************************
-S_MENU   WTO   '---------------------------------'
-         WTO   '---------      MENU     ---------'
-         WTO   '---------------------------------'
+S_MENU   WTO   '------------------------------------------------------'
+         WTO   '-------------------      MENU      -------------------'
+         WTO   '------------------------------------------------------'
          WTO   '1) CAMBIAR MENSAJE'
          WTO   '2) MOSTRAR MENSAJE'
          WTO   '3) CODIFICAR MENSAJE'
@@ -117,7 +116,7 @@ S_MENU   WTO   '---------------------------------'
 		 CLC   OPCION,=C'2'
 		 BE    VER_MSJ
 		 CLC   OPCION,=C'3'
-		 BE    MENU
+		 BE    ENCODE
 		 CLC   OPCION,=C'4'
 		 BE    MENU
 		 CLC   OPCION,=C'5'
@@ -131,7 +130,7 @@ S_MENU   WTO   '---------------------------------'
 
 
 ***********************************************************************
-* VER MENSAJEZ OPCION DEL MENU
+* VER MENSAJEZ OPCION DEL MENU (OPCION 2)
 ***********************************************************************
 VER_MSJ  WTO   MF=(E,STR_MSJ-4)
          B     MENU
@@ -140,7 +139,25 @@ VER_MSJ  WTO   MF=(E,STR_MSJ-4)
 
 
 ***********************************************************************
-* MOSTRAR MATRIZ OPCION DEL MENU
+* PROCESO DE CODIFICADION (OPCION 3)
+***********************************************************************
+ENCODE   MVC   ENC_DEC,=C'E'
+         B     ENCRIPT
+***********************************************************************
+***********************************************************************
+
+
+***********************************************************************
+* PROCESO DE DECODIFICADION (OPCION 4)
+***********************************************************************
+DECODE   MVC   ENC_DEC,=C'D'
+         B     ENCRIPT
+***********************************************************************
+***********************************************************************
+
+
+***********************************************************************
+* MOSTRAR MATRIZ OPCION DEL MENU (OPCION 5)
 ***********************************************************************
 VER_MATR BAL   12,S_MATRIZ
          B     MENU
@@ -149,16 +166,151 @@ VER_MATR BAL   12,S_MATRIZ
 
 
 ***********************************************************************
-* MOSTRAR MATRIZ (REGISTRO 10 Y 11, VUELVO REGISTRO 12)
+* REALIZAR EL PROCESO DE CODIFICACION Y DECODIFICACION
+***********************************************************************
+*  RECORRO POR DUPLAS Y VOY ARMANDO EL MENSAJE EN AUX_MSJ
+ENCRIPT  LA    5,10
+         LA    6,STR_MSJ
+         LA    7,AUX_MSJ
+S_ENCRYP MVC   DUPLA(2),0(6)
+         B     DO_ENC
+S_DO_ENC MVC   0(2,7),AUXDUPLA
+         LA    7,2(7)
+         LA    6,2(6)
+         BCT   5,S_ENCRYP
+         B     FIN
+
+*  DE UNA DUPLA OBTENGO OTRA DUPLA CON EL ALGORITMO SELECCIONADO
+DO_ENC   CLC   DUPLA(1),=C' '
+         BE    F_DO_ENC
+         CLC   DUPLA+1(1),=C' '
+         BE    F_DO_ENC
+         MVC   AUX_CHAR(1),DUPLA
+         BAL   12,BUSCARFL
+         ZAP   FIL_1,AUX_FIL
+         ZAP   COL_1,AUX_COL
+         MVC   AUX_CHAR(1),DUPLA+1
+         BAL   12,BUSCARFL
+         ZAP   FIL_2,AUX_FIL
+         ZAP   COL_2,AUX_COL
+         B     EXCHANGE
+FIN_ENC  B     S_DO_ENC
+
+*  SI ALGUN CARACTER EL UN ESPACIO, LA DUPLA QUEDA IGUAL
+F_DO_ENC MVC   AUXDUPLA(2),DUPLA
+         B     FIN_ENC
+
+*  REALIZAR LA CODIFICACION D PARA DECODE Y E PARA ENCODE
+EXCHANGE CLC   ENC_DEC,=C'D'
+         BE    XCH_DEC
+         CP    FIL_1,FIL_2 *ARRANCO LA CODIFICACION
+         BNE   NE_FIL
+         B     XCHG_DER *FILAS = Y COLUMNAS != VALIDADO ANTERIORMENTE
+NE_FIL   CP    COL_1,COL_2
+         BE    NE_COL
+         BAL   11,SWITCH * FILAS Y COLUMNAS SON DISTINTAS
+NE_COL   B     XCHG_ABJ *FILAS DISTINTAS Y COLUMNAS IGUALES HACIA ABAJO
+
+XCH_DEC  CP    FIL_1,FIL_2 *ARRANCO LA DECODIFICACION
+         BNE   D_NE_FIL
+         B     XCHG_IZQ *FILAS = Y COLUMNAS != VALIDADO ANTERIORMENTE
+D_NE_FIL CP    COL_1,COL_2
+         BE    D_NE_COL
+         BAL   11,SWITCH * FILAS Y COLUMNAS SON DISTINTAS
+D_NE_COL B     XCHG_ARR *FILAS DISTINTAS Y COLUMNAS IGUALES PARA ARRIBA
+
+*  HACER EL CAMBIO A DERECHA
+XCHG_DER ZAP   AUX_COL,=P'0'
+         CP    COL_1,=P'4'
+         BE    X_DER_C1
+         ZAP   AUX_COL,COL_1
+         AP    AUX_COL,=P'1'
+X_DER_C1 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_COL,=P'0'
+         CP    COL_2,=P'4'
+         BE    X_DER_C2
+         ZAP   AUX_COL,COL_2
+         AP    AUX_COL,=P'1'
+X_DER_C2 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+         
+*  HACER EL CAMBIO ABAJO
+XCHG_ABJ ZAP   AUX_FIL,=P'0'
+         CP    FIL_1,=P'4'
+         BE    X_ABJ_F1
+         ZAP   AUX_FIL,FIL_1
+         AP    AUX_FIL,=P'1'
+X_ABJ_F1 ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_COL,=P'0'
+         CP    FIL_2,=P'4'
+         BE    X_ABJ_F2
+         ZAP   AUX_FIL,FIL_2
+         AP    AUX_FIL,=P'1'
+X_ABJ_F2 ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+
+*  HACER EL CAMBIO A IZQUIERDA
+XCHG_IZQ ZAP   AUX_COL,=P'4'
+         CP    COL_1,=P'0'
+         BE    X_IZQ_C1
+         ZAP   AUX_COL,COL_1
+         SP    AUX_COL,=P'1'
+X_IZQ_C1 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_COL,=P'4'
+         CP    COL_2,=P'0'
+         BE    X_IZQ_C2
+         ZAP   AUX_COL,COL_2
+         SP    AUX_COL,=P'1'
+X_IZQ_C2 ZAP   AUX_FIL,FIL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         
+         B     FIN_ENC
+         
+*  HACER EL CAMBIO ARRIBA
+XCHG_ARR ZAP   AUX_FIL,=P'4'
+         CP    FIL_1,=P'0'
+         BE    X_ARR_F1
+         ZAP   AUX_FIL,FIL_1
+         SP    AUX_FIL,=P'1'
+X_ARR_F1 ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_COL,=P'4'
+         CP    FIL_2,=P'0'
+         BE    X_ARR_F2
+         ZAP   AUX_FIL,FIL_2
+         SP    AUX_FIL,=P'1'
+X_ARR_F2 ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         B     FIN_ENC
+
+***********************************************************************
+***********************************************************************
+
+
+***********************************************************************
+* RUTINA PARA MOSTRAR MATRIZ (REGISTRO 10 Y 11, VUELVO REGISTRO 12)
 ***********************************************************************
 S_MATRIZ LA    10,MATRIZ
          LA    11,5
-         WTO   '---------------------------------------------------'
+         WTO   '------------------------------------------------------'
 SIG_MAT  MVC   VER_MAT(5),0(10)
          WTO   MF=(E,WTOBLOCK)
          LA    10,5(10)
          BCT   11,SIG_MAT
-         WTO   '---------------------------------------------------'
+         WTO   '------------------------------------------------------'
          BR    12
 ***********************************************************************
 ***********************************************************************
@@ -175,6 +327,70 @@ SIG_HARD MVC   0(1,5),0(7)
          B     MSJ
 
 MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
+
+***********************************************************************
+* RUTINA QUE RECIBE AUX_CHAR Y DEVUELVE EN AUX_FIL Y AUX_COL
+* LA POSICION DE LA LETRA EN LA MATRIZ
+* SE LLAMA CON EL REGISTRO 12
+***********************************************************************
+BUSCARFL LA    8,25
+         LA    9,MATRIZ
+         ZAP   AUX_FIL,=P'0'
+         ZAP   AUX_COL,=P'0'
+S_BUSCAR CLC   AUX_CHAR,0(9)
+         BE    F_BUSCAR
+         AP    AUX_COL,=P'1'
+         CP    AUX_COL,=P'5'
+         BE    FILCOL
+S_FILCOL LA    9,1(9)
+         BCT   8,S_BUSCAR
+F_BUSCAR BR    12
+
+FILCOL   ZAP   AUX_COL,=P'0'
+         AP    AUX_FIL,=P'1'
+         B     S_FILCOL
+***********************************************************************
+***********************************************************************
+
+
+***********************************************************************
+* RUTINA PARA HACER EL CAMBIO CRUZADO
+* RECIBE FIL_1, COL_1, FIL_2, COL_2
+* DEVUELVE LA DUPLA CODIFICADA O DECODIFICADA EN AUXDUPLA
+* SE LLAMA CON EL REGISTRO 11
+***********************************************************************
+SWITCH   ZAP   AUX_FIL,FIL_1
+         ZAP   AUX_COL,COL_2
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA(1),AUX_CHAR
+         ZAP   AUX_FIL,FIL_2
+         ZAP   AUX_COL,COL_1
+         BAL   8,GETLETRA
+         MVC   AUXDUPLA+1(1),AUX_CHAR
+         BR    11
+***********************************************************************
+***********************************************************************
+
+
+***********************************************************************
+* RUTINA QUE RECIBE AUX_COL Y AUX_FIL Y DEVUELVE LA LETRA EN ESA 
+* POSICION EN LA MATRIZ Y SE LA LLAMA CON EL REGISTRO 8
+* LO DEJA EN AUX_CHAR
+***********************************************************************
+GETLETRA ZAP   AUX_POS,=P'0'
+         ZAP   POS_MAT,=P'-1'
+         LA    9,MATRIZ
+         ZAP   AUX_POS,AUX_FIL
+         MP    AUX_POS,=P'5'
+         AP    AUX_POS,AUX_COL
+S_GETLTR MVC   AUX_CHAR(1),0(9)
+         LA    9,1(9)
+         AP    POS_MAT,=P'1'
+         CP    POS_MAT,AUX_POS
+         BNE   S_GETLTR
+F_GETLTR BR    8
+***********************************************************************
+***********************************************************************
 
 
 ***********************************************************************
@@ -201,7 +417,28 @@ VALID    DS    CL1
 
 MSJ_VAL  DS    CL1
 
+*  ENCODE=E / DECODE=D
+ENC_DEC  DS    CL1
+
+* PARA REALIZAR LA CODIFICACION Y DECODIFICACION DEL MENSAJE
 DUPLA    DS    CL2
+FIL_1    DS    PL1
+FIL_2    DS    PL1
+COL_1    DS    PL1
+COL_2    DS    PL1
+AUXDUPLA DS    CL2
+         DC    H'24'
+         DC    H'0'
+AUX_MSJ  DS    CL20
+
+*  PARA BUSCAR LAS LETRAS EN LA MATRIZ Y LAS POSICIONES DE LAS LETRAS
+AUX_FIL  DS    PL1
+AUX_COL  DS    PL1
+AUX_CHAR DS    CL1
+
+*  PARA LA RUTINA QUE BUSCA LA LETRA EN LA MATRIZ
+AUX_POS  DS    PL2
+POS_MAT  DS    PL2
 ***********************************************************************
 ***********************************************************************
 
