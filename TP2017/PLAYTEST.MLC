@@ -252,7 +252,7 @@ XCHG_ABJ ZAP   AUX_FIL,=P'0'
 X_ABJ_F1 ZAP   AUX_COL,COL_1
          BAL   8,GETLETRA
          MVC   AUXDUPLA(1),AUX_CHAR
-         ZAP   AUX_COL,=P'0'
+         ZAP   AUX_FIL,=P'0'
          CP    FIL_2,=P'4'
          BE    X_ABJ_F2
          ZAP   AUX_FIL,FIL_2
@@ -276,7 +276,7 @@ X_IZQ_C1 ZAP   AUX_FIL,FIL_1
          BE    X_IZQ_C2
          ZAP   AUX_COL,COL_2
          SP    AUX_COL,=P'1'
-X_IZQ_C2 ZAP   AUX_FIL,FIL_1
+X_IZQ_C2 ZAP   AUX_FIL,FIL_2
          BAL   8,GETLETRA
          MVC   AUXDUPLA+1(1),AUX_CHAR
          B     FIN_ENC
@@ -290,7 +290,7 @@ XCHG_ARR ZAP   AUX_FIL,=P'4'
 X_ARR_F1 ZAP   AUX_COL,COL_1
          BAL   8,GETLETRA
          MVC   AUXDUPLA(1),AUX_CHAR
-         ZAP   AUX_COL,=P'4'
+         ZAP   AUX_FIL,=P'4'
          CP    FIL_2,=P'0'
          BE    X_ARR_F2
          ZAP   AUX_FIL,FIL_2
