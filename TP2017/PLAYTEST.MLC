@@ -1,5 +1,6 @@
 PLAYFAIR SUBENTRY BASES=(3,4)
-		 B     INICIAR
+*		 B     INICIAR
+         B     HARDCODE
 MSJ      B     S_MSJ
 MENU     B     S_MENU
 FIN      WTO   'FIN'
@@ -174,6 +175,7 @@ ENCRIPT  LA    5,10
 S_ENCRYP MVC   DUPLA(2),0(6)
          B     DO_ENC
 S_DO_ENC MVC   0(2,7),AUXDUPLA
+         WTO   MF=(E,AUXDUPLA-4)
          LA    7,2(7)
          LA    6,2(6)
          BCT   5,S_ENCRYP
@@ -182,6 +184,7 @@ S_DO_ENC MVC   0(2,7),AUXDUPLA
 
 *  DE UNA DUPLA OBTENGO OTRA DUPLA CON EL ALGORITMO SELECCIONADO
 DO_ENC   CLC   DUPLA(1),=C' '
+         WTO   MF=(E,DUPLA-4)
          BE    F_DO_ENC
          CLC   DUPLA+1(1),=C' '
          BE    F_DO_ENC
@@ -316,6 +319,18 @@ SIG_MAT  MVC   VER_MAT(5),0(10)
 ***********************************************************************
 ***********************************************************************
 
+* PARA BORRAR
+* HARDCODEAR MATRIZ
+HARDCODE LA    5,MATRIZ
+         LA    6,25
+         LA    7,MAT_HARD
+SIG_HARD MVC   0(1,5),0(7)
+         LA    7,1(7)
+         LA    5,1(5)
+         BCT   6,SIG_HARD
+         B     MSJ
+
+MAT_HARD DC    CL25'ABCDEFGHIKLMNOPQRSTUVWXYZ'
 
 ***********************************************************************
 * RUTINA QUE RECIBE AUX_CHAR Y DEVUELVE EN AUX_FIL Y AUX_COL
@@ -333,6 +348,14 @@ S_BUSCAR CLC   AUX_CHAR,0(9)
          BE    FILCOL
 S_FILCOL LA    9,1(9)
          BCT   8,S_BUSCAR
+         WTO   'FIL'
+         UNPK  STR_FIL,AUX_FIL
+         MVZ   STR_FIL,=X'FF'
+         WTO   MF=(E,STR_FIL-4)
+         WTO   'COL'
+         UNPK  STR_COL,AUX_COL
+         MVZ   STR_COL,=X'FF'
+         WTO   MF=(E,STR_COL-4)
 F_BUSCAR BR    12
 
 FILCOL   ZAP   AUX_COL,=P'0'
@@ -410,11 +433,15 @@ MSJ_VAL  DS    CL1
 ENC_DEC  DS    CL1
 
 * PARA REALIZAR LA CODIFICACION Y DECODIFICACION DEL MENSAJE
+         DC    H'6'
+         DC    H'0'
 DUPLA    DS    CL2
 FIL_1    DS    PL1
 FIL_2    DS    PL1
 COL_1    DS    PL1
 COL_2    DS    PL1
+         DC    H'6'
+         DC    H'0'
 AUXDUPLA DS    CL2
          DC    H'24'
          DC    H'0'
@@ -424,6 +451,13 @@ AUX_MSJ  DS    CL20
 AUX_FIL  DS    PL1
 AUX_COL  DS    PL1
 AUX_CHAR DS    CL1
+
+         DC    H'5'
+         DC    H'0'
+STR_COL  DS    CL1
+         DC    H'5'
+         DC    H'0'
+STR_FIL  DS    CL1
 
 *  PARA LA RUTINA QUE BUSCA LA LETRA EN LA MATRIZ
 AUX_POS  DS    PL2
