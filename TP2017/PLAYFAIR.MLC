@@ -31,6 +31,10 @@ VAL_CHAR CLI   CHAR,C'J'
          BL    NV_CHAR
          CLI   CHAR,C'Z'
          BH    NV_CHAR
+         CLI   CHAR,C'}'
+         BE    NV_CHAR
+         CLI   CHAR,C'\'
+         BE    NV_CHAR
          MVC   VALID,=C'T'
 F_V_CHAR BR    7
 
