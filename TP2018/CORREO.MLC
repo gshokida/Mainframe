@@ -1,0 +1,27 @@
+**********************************************************************
+*INICIO
+**********************************************************************
+CORREO   SUBENTRY BASES=(3,4)
+         WTO   'INICIANDO'
+         B     INICIAR
+FIN_P    WTO   'FIN'
+         SUBEXIT
+
+INICIAR  OPEN  (ARCH,(INPUT))
+PROX     GET   ARCH,REG
+         AP    CANT_REG,=P'1'
+         B     PROX
+FINARCH  B     FIN_P
+
+* REGISTRO A LEER EN EL ARCHIVO
+REG      DS    0CL2
+REG_DEST DS    CL1
+REG_PESO DS    PL1
+
+* CONTADOR DE OBJETOS
+CANT_REG DC    PL2'0'
+
+* DATOS DEL ARCHIVO
+ARCH     DCB   DDNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
+FILENAME DC    C'C:\PACKS.DAT',X'00'
+         END

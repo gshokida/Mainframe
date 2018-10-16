@@ -1,0 +1,11 @@
+INICIO   SUBENTRY BASES=(3,4)
+         WTO   'INICIANDO'
+FIN_P    WTO   'FIN'
+         SUBEXIT
+
+REG      DS    0CL2
+REG_DEST DS    CL1
+REG_PESO DS    PL1
+
+CANT_REG DC    PL2'0'
+         END
