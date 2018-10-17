@@ -1,11 +1,27 @@
 **********************************************************************
-*INICIO
+* CORREO
+*
+* A TENER EN CUENTA:
+* TENGO 20 OBJETOS COMO MÁXIMO, SOLO LEO LOS PRIMEROS 20 REGISTROS
+*
+* SI EL DESTINO NO COINCIDE CON NINGUNO DE LOS PREVISTOS LO SALTEO
+* CUANDO AGRUPO LOS PAQUETES
+*
+* EL ALGORITMO DE MEJORA ES AGRUPAR POR PESO RECORRIENDO DE FORMA
+* SECUENCIAL EL VECTOR Y SUMANDO HASTA LLEGAR A 8.
+*
+* TABLA DESTINOS: 
+* M (D4) MAR DEL PLATA
+* B (C2) BARILOCHE
+* P (D7) POSADAS
+* S (E2) SALTA
 **********************************************************************
 CORREO   SUBENTRY BASES=(3,4)
          WTO   'INICIANDO'
          B     INICIAR
-FIN_P    WTO   'FIN'
-         WTO   MF=(E,WTOBLOCK)
+FIN_INI  B     MOSTRAR
+FIN_MOS  B     OPTIMIZ
+FIN_PROG WTO   'FIN'
          SUBEXIT
 
 **********************************************************************
@@ -13,22 +29,50 @@ FIN_P    WTO   'FIN'
 **********************************************************************
 
 * LEE EL ARCHIVO Y ARMA EL VECTOR CON LOS DATOS
+* TODO: VALIDAR EL PESO DE LOS OBJETOS
 INICIAR  OPEN  (ARCH,(INPUT))
-         LA    5,20
+         L     5,MAX_OBJ
+         LA    6,0 *GUARDO LA CANTIDAD DE PAQUETES EN EL REGISTRO 6
          LA    7,V_DEST
          LA    8,V_PESO
 I_PROX   GET   ARCH,REG
          MVC   0(1,7),REG_DEST
-         MVC   0(1,8),V_PESO
+         MVC   0(1,8),REG_PESO
          AP    CANT_REG,=P'1'
          LA    7,1(7)
          LA    8,1(8)
+         LA    6,1(6)
          BCT   5,I_PROX
-FINARCH  B     FIN_P
+FINARCH  CLOSE ARCH
+         B     FIN_INI
 
+
+* MUESTRO EL LISTADO DE PAQUETES
+MOSTRAR  LA    5,0
+         AR    5,6
+         LA    7,V_DEST
+         LA    8,V_PESO
+         LA    9,V_NUM
+M_PROX   MVC   M_PAQUE+9(2),0(9)
+         MVC   M_PAQUE+21(1),0(7)
+         UNPK  PESO_C,0(1,8)
+         MVZ   PESO_C,=X'FF'
+         MVC   M_PAQUE+29(1),PESO_C
+         WTO   MF=(E,M_PAQUE-4)
+         LA    7,1(7)
+         LA    8,1(8)
+         LA    9,2(9)
+         BCT   5,M_PROX
+         B     FIN_MOS
+
+* OPTIMIZO LOS PESOS DE LOS OBJETOS Y ARMO LOS PAQUETES
+OPTIMIZ  WTO   'TODO'
+         B     FIN_PROG
 **********************************************************************
 * DEFINICION DE VARIABLES
 **********************************************************************
+* CANTIDAD DE PAQUETES MAXIMO
+MAX_OBJ  DC    F'20'
 
 * REGISTRO A LEER EN EL ARCHIVO
 REG      DS    0CL2
@@ -36,10 +80,12 @@ REG_DEST DS    CL1
 REG_PESO DS    PL1
 
 * VECTOR PARA DESTINO Y PESO
-WTOBLOCK DC    H'28'
-         DC    H'0'
 V_DEST   DC    20C' '
 V_PESO   DC    20P'0'
+V_NUM    DC    C'0102030405060708091011121314151617181920'
+V_MARCA  DC    20C'N'
+
+DESTINOS DC    C'MBPS'
 
 * CONTADOR DE OBJETOS
 CANT_REG DC    PL2'0'
@@ -47,4 +93,11 @@ CANT_REG DC    PL2'0'
 * DATOS DEL ARCHIVO
 ARCH     DCB   DSNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
 FILENAME DC    C'C:\PACKS.DAT',X'00'
+
+* MOSTRAR POR PANTALLA LOS PAQUETES
+         DC    H'34'
+         DC    H'0'
+M_PAQUE  DC    C'PAQUETE:    DESTINO:   PESO:  '
+
+PESO_C   DS    CL1
          END
