@@ -17,9 +17,10 @@
 * S (E2) SALTA
 **********************************************************************
 CORREO   SUBENTRY BASES=(3,4)
-         WTO   'INICIANDO'
+         WTO   'INICIANDO LA CARGA DEL ARCHIVO'
          B     INICIAR
-FIN_INI  B     MOSTRAR
+FIN_INI  WTO   'LISTADO DE PAQUETES CARGADOS CORRECTAMENTE:'
+         B     MOSTRAR
 FIN_MOS  B     OPTIMIZ
 FIN_PROG WTO   'FIN'
          SUBEXIT
@@ -29,13 +30,16 @@ FIN_PROG WTO   'FIN'
 **********************************************************************
 
 * LEE EL ARCHIVO Y ARMA EL VECTOR CON LOS DATOS
-* TODO: VALIDAR EL PESO DE LOS OBJETOS
 INICIAR  OPEN  (ARCH,(INPUT))
          L     5,MAX_OBJ
          LA    6,0 *GUARDO LA CANTIDAD DE PAQUETES EN EL REGISTRO 6
          LA    7,V_DEST
          LA    8,V_PESO
 I_PROX   GET   ARCH,REG
+         CP    REG_PESO,=P'1' * VALIDO QUE PESO >= 1
+         BL    P_INCORR
+         CP    REG_PESO,=P'8' * VALIDO QUE PESO <= 8
+         BH    P_INCORR
          MVC   0(1,7),REG_DEST
          MVC   0(1,8),REG_PESO
          AP    CANT_REG,=P'1'
@@ -44,9 +48,11 @@ I_PROX   GET   ARCH,REG
          LA    6,1(6)
          BCT   5,I_PROX
 FINARCH  CLOSE ARCH
+         WTO   'FINALIZO LA CARGA DEL ARCHIVO'
          B     FIN_INI
 
-
+P_INCORR WTO   'PAQUETE MAL INGRESADO: PESO INCORRECTO'
+         B     I_PROX
 * MUESTRO EL LISTADO DE PAQUETES
 MOSTRAR  LA    5,0
          AR    5,6
