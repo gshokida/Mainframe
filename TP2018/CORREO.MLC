@@ -5,23 +5,46 @@ CORREO   SUBENTRY BASES=(3,4)
          WTO   'INICIANDO'
          B     INICIAR
 FIN_P    WTO   'FIN'
+         WTO   MF=(E,WTOBLOCK)
          SUBEXIT
 
+**********************************************************************
+* DEFINICION DE RUTINAS O PROCEDIMIENTOS
+**********************************************************************
+
+* LEE EL ARCHIVO Y ARMA EL VECTOR CON LOS DATOS
 INICIAR  OPEN  (ARCH,(INPUT))
-PROX     GET   ARCH,REG
+         LA    5,20
+         LA    7,V_DEST
+         LA    8,V_PESO
+I_PROX   GET   ARCH,REG
+         MVC   0(1,7),REG_DEST
+         MVC   0(1,8),V_PESO
          AP    CANT_REG,=P'1'
-         B     PROX
+         LA    7,1(7)
+         LA    8,1(8)
+         BCT   5,I_PROX
 FINARCH  B     FIN_P
+
+**********************************************************************
+* DEFINICION DE VARIABLES
+**********************************************************************
 
 * REGISTRO A LEER EN EL ARCHIVO
 REG      DS    0CL2
 REG_DEST DS    CL1
 REG_PESO DS    PL1
 
+* VECTOR PARA DESTINO Y PESO
+WTOBLOCK DC    H'28'
+         DC    H'0'
+V_DEST   DC    20C' '
+V_PESO   DC    20P'0'
+
 * CONTADOR DE OBJETOS
 CANT_REG DC    PL2'0'
 
 * DATOS DEL ARCHIVO
-ARCH     DCB   DDNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
+ARCH     DCB   DSNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
 FILENAME DC    C'C:\PACKS.DAT',X'00'
          END
