@@ -21,7 +21,7 @@ CORREO   SUBENTRY BASES=(3,4)
          B     INICIAR
 FIN_INI  WTO   'LISTADO DE PAQUETES CARGADOS CORRECTAMENTE:'
          B     MOSTRAR
-FIN_MOS  B     OPTIMIZ
+FIN_MOS  B     OPTIMIZO
 FIN_PROG WTO   'FIN'
          SUBEXIT
 
@@ -87,7 +87,15 @@ M_PROX   MVC   M_PAQUE+9(2),0(9)
          B     FIN_MOS
 
 * OPTIMIZO LOS PESOS DE LOS OBJETOS Y ARMO LOS PAQUETES
-OPTIMIZ  WTO   'TODO'
+OPTIMIZO WTO   'TODO'
+         LA    5,0
+         AR    5,6 * CARGO LA CANTIDAD DE OBJETOS 
+         LA    7,4 * RECORRO LOS 4 DESTINOS
+         LA    8,V_DEST
+         LA    9,V_PESO
+         LA    10,V_MARCA
+         ZAP   AUX_NUM,=P'0'
+         
          B     FIN_PROG
          
 **********************************************************************
@@ -122,4 +130,9 @@ FILENAME DC    C'C:\PACKS.DAT',X'00'
 M_PAQUE  DC    C'PAQUETE:    DESTINO:   PESO:  '
 
 PESO_C   DS    CL1
+
+* AUXULIARES PARA LA OPTIMIZACION
+AUX_NUM  DS    PL2
+AUX_PESO DS    PL2
+SUM_PESO DS    PL2
          END
