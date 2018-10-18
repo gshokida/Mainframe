@@ -32,15 +32,26 @@ FIN_PROG WTO   'FIN'
 * LEE EL ARCHIVO Y ARMA EL VECTOR CON LOS DATOS
 INICIAR  OPEN  (ARCH,(INPUT))
          L     5,MAX_OBJ
-         LA    6,0 *GUARDO LA CANTIDAD DE PAQUETES EN EL REGISTRO 6
+*********GUARDO LA CANTIDAD DE PAQUETES EN EL REGISTRO 6
+         LA    6,0
          LA    7,V_DEST
          LA    8,V_PESO
 I_PROX   GET   ARCH,REG
+*********VALIDO EL PESO DEL REGISTRO
          CP    REG_PESO,=P'1' * VALIDO QUE PESO >= 1
          BL    P_INCORR
          CP    REG_PESO,=P'8' * VALIDO QUE PESO <= 8
          BH    P_INCORR
-         MVC   0(1,7),REG_DEST
+*********VALIDO EL DESTINO DEL REGISTRO
+         LA    9,4
+         LA    10,DESTINOS
+SIG_DEST CLC   0(1,10),REG_DEST
+         BE    GRABO
+         LA    10,1(10)
+         BCT   9,SIG_DEST
+         B     P_INC_D
+*********GRABO EN EL VECTOR EL REGISTRO
+GRABO    MVC   0(1,7),REG_DEST
          MVC   0(1,8),REG_PESO
          AP    CANT_REG,=P'1'
          LA    7,1(7)
@@ -53,6 +64,10 @@ FINARCH  CLOSE ARCH
 
 P_INCORR WTO   'PAQUETE MAL INGRESADO: PESO INCORRECTO'
          B     I_PROX
+         
+P_INC_D  WTO   'PAQUETE MAL INGRESADO: DESTINO INCORRECTO'
+         B     I_PROX         
+         
 * MUESTRO EL LISTADO DE PAQUETES
 MOSTRAR  LA    5,0
          AR    5,6
@@ -74,6 +89,7 @@ M_PROX   MVC   M_PAQUE+9(2),0(9)
 * OPTIMIZO LOS PESOS DE LOS OBJETOS Y ARMO LOS PAQUETES
 OPTIMIZ  WTO   'TODO'
          B     FIN_PROG
+         
 **********************************************************************
 * DEFINICION DE VARIABLES
 **********************************************************************
