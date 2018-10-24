@@ -1,0 +1,174 @@
+**********************************************************************
+* CORREO
+*
+* A TENER EN CUENTA:
+* TENGO 20 OBJETOS COMO M?XIMO, SOLO LEO LOS PRIMEROS 20 REGISTROS
+*
+* SI EL DESTINO NO COINCIDE CON NINGUNO DE LOS PREVISTOS LO SALTEO
+* CUANDO AGRUPO LOS PAQUETES
+*
+* EL ALGORITMO DE MEJORA ES AGRUPAR POR PESO RECORRIENDO DE FORMA
+* SECUENCIAL EL VECTOR Y SUMANDO HASTA LLEGAR A 8.
+*
+* TABLA DESTINOS: 
+* M (D4) MAR DEL PLATA
+* B (C2) BARILOCHE
+* P (D7) POSADAS
+* S (E2) SALTA
+**********************************************************************
+CORREO   SUBENTRY BASES=(3,4)
+         WTO   'INICIANDO LA CARGA DEL ARCHIVO'
+         B     INICIAR
+FIN_INI  WTO   'LISTADO DE OBJETOS CARGADOS CORRECTAMENTE:'
+         B     MOSTRAR
+         WTO   'OPTIMIZO LOS OBJETOS EN PAQUETES:'
+FIN_MOS  B     OPTIMIZO
+FIN_PROG WTO   'FIN'
+         SUBEXIT
+
+**********************************************************************
+* DEFINICION DE RUTINAS O PROCEDIMIENTOS
+**********************************************************************
+
+* LEE EL ARCHIVO Y ARMA EL VECTOR CON LOS DATOS
+INICIAR  OPEN  (ARCH,(INPUT))
+         L     5,MAX_OBJ
+*********GUARDO LA CANTIDAD DE PAQUETES EN EL REGISTRO 6
+         LA    6,0
+         LA    7,V_OBJ
+I_PROX   GET   ARCH,REG
+*********VALIDO EL PESO DEL REGISTRO
+         CP    REG_PESO,=P'1' * VALIDO QUE PESO >= 1
+         BL    P_INCORR
+         CP    REG_PESO,=P'8' * VALIDO QUE PESO <= 8
+         BH    P_INCORR
+*********VALIDO EL DESTINO DEL REGISTRO
+         LA    9,4
+         LA    10,DESTINOS
+SIG_DEST CLC   0(1,10),REG_DEST
+         BE    GRABO
+         LA    10,1(10)
+         BCT   9,SIG_DEST
+         B     P_INC_D
+*********GRABO EN EL VECTOR EL REGISTRO
+GRABO    MVC   0(1,7),REG_DEST
+         MVC   1(1,7),REG_PESO
+         MVC   2(1,7),=C'N'
+         AP    CANT_REG,=P'1'
+         LA    7,3(7)
+         LA    6,1(6)
+         BCT   5,I_PROX
+FINARCH  CLOSE ARCH
+         WTO   'FINALIZO LA CARGA DEL ARCHIVO'
+         B     FIN_INI
+
+P_INCORR WTO   'PAQUETE MAL INGRESADO: PESO INCORRECTO'
+         B     I_PROX
+         
+P_INC_D  WTO   'PAQUETE MAL INGRESADO: DESTINO INCORRECTO'
+         B     I_PROX         
+         
+* MUESTRO EL LISTADO DE PAQUETES
+MOSTRAR  LA    5,0
+         AR    5,6
+         LA    7,V_OBJ
+         LA    9,V_NUM
+M_PROX   MVC   M_OBJET+8(2),0(9)
+         MVC   M_OBJET+29(1),0(7)
+         UNPK  PESO_C,1(1,7)
+         MVZ   PESO_C,=X'FF'
+         MVC   M_OBJET+17(1),PESO_C
+         WTO   MF=(E,M_OBJET-4)
+         LA    7,3(7)
+         LA    9,2(9)
+         BCT   5,M_PROX
+         B     FIN_MOS
+
+* OPTIMIZO LOS PESOS DE LOS OBJETOS Y ARMO LOS PAQUETES
+OPTIMIZO LA    5,0
+         AR    5,6 * CARGO LA CANTIDAD DE OBJETOS 
+         LA    7,V_OBJ
+         ZAP   AUX_NUM,=P'1'
+NUEV_OBJ CLC   2(1,7),=C'N'
+         BNE   SIG_OBJ
+         B     COP_DEST
+         
+         
+         
+RET_DES  WTO   MF=(E,M_PACK-4)
+         AP    AUX_NUM,=P'1'
+SIG_OBJ  LA    7,3(7)
+         BCT   5,NUEV_OBJ
+         B     FIN_PROG
+
+* IMPRIME LA LINEA DE PAQUETE
+COP_DEST LA    9,M_PACK
+         UNPK  AUX_NPAQ,AUX_NUM
+         MVZ   AUX_NPAQ+1,=X'FF'
+         MVC   9(2,9),AUX_NPAQ
+         CLC   0(1,7),=C'M'
+         BE    MDP
+         CLC   0(1,7),=C'B'
+         BE    BARI
+         CLC   0(1,7),=C'P'
+         BE    POSAD
+         MVC   21(13,9),SALTA
+         B     RET_DES
+MDP      MVC   21(13,9),MARDEL
+         B     RET_DES
+BARI     MVC   21(13,9),BARILOC
+         B     RET_DES
+POSAD    MVC   21(13,9),POSADAS
+         B     RET_DES
+**********************************************************************
+* DEFINICION DE VARIABLES
+**********************************************************************
+* CANTIDAD DE PAQUETES MAXIMO
+MAX_OBJ  DC    F'20'
+
+* REGISTRO A LEER EN EL ARCHIVO
+REG      DS    0CL2
+REG_DEST DS    CL1
+REG_PESO DS    PL1
+
+* VECTOR PARA DESTINO Y PESO
+         DC    H'16'
+         DC    H'0'
+V_OBJ    DS    20CL3 * DEST, PESO, MARCA SI PASO AL ARMAR EL PAQUETE
+
+V_NUM    DC    C'0102030405060708091011121314151617181920'
+
+DESTINOS DC    C'MBPS'
+
+* CONTADOR DE OBJETOS
+CANT_REG DC    PL2'0'
+
+* DATOS DEL ARCHIVO
+ARCH     DCB   DSNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
+FILENAME DC    C'C:\PACKS.DAT',X'00'
+
+* MOSTRAR POR PANTALLA LOS OBJETOS
+         DC    H'46'
+         DC    H'0'
+M_OBJET  DC    C'OBJETO:    PESO:    DESTINO:              '
+
+PESO_C   DS    CL1
+
+* MOSTRAR POR PANTALLA LOS PAQUETES
+         DC    H'38'
+         DC    H'0'
+M_PACK   DC    C'PAQUETE:    DESTINO:              '
+
+MARDEL   DC    C'MAR DEL PLATA'
+BARILOC  DC    C'BARILOCHE    '
+POSADAS  DC    C'POSADAS      '
+SALTA    DC    C'SALTA        '
+         DC    H'5'
+
+* AUXULIARES PARA LA OPTIMIZACION
+AUX_NUM  DS    PL2
+AUX_PESO DS    PL2
+SUM_PESO DS    PL2
+AUX_NPAQ DS    CL2
+
+         END

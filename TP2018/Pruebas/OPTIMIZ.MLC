@@ -1,0 +1,65 @@
+INICIO   SUBENTRY BASES=(3,4)
+         WTO   'INICIANDO'
+         LA    6,7
+         LA    5,7
+         ZAP   AUX_PACK,=P'1'
+         LA    8,V_PESO
+CARGAR   MVC   0(1,8),AUX_PACK
+         LA    8,1(8)
+         AP    AUX_PACK,=P'1'
+         BCT   5,CARGAR
+         B     OPTIMIZ
+FIN_PROG WTO   'FIN'
+         SUBEXIT
+
+OPTIMIZ  LA    5,0
+         AR    5,6 * CARGO LA CANTIDAD DE OBJETOS 
+         LA    7,4 * RECORRO LOS 4 DESTINOS
+         LA    11,DESTINOS
+OTRODEST LA    10,V_MARCA
+         LA    8,V_DEST
+         LA    9,V_PESO
+         LA    12,V_NUM
+         ZAP   AUX_NUM,=P'0'    
+         ZAP   AUX_PESO,=P'0' 
+SIG_VEC  CLC   0(1,8),0(8)
+         BNE   OTROREG
+         CLI   0(1,10),=C'N'
+         BNE   OTROREG
+* ES N Y TIENE EL MISMO DESTINO
+         ZAP   SUM_PESO,AUX_PESO
+         AP    SUM_PESO,0(1,9)
+         CP    SUM_PESO,=P'8'
+         BH    OTROREG
+         
+         
+OTROREG  LA    8,1(8)
+         LA    9,1(9)
+         LA    10,1(10)
+         AP    AUX_NUM,=P'1'
+         BCT   5,SIG_VEC
+* VERIFICAR SI ESTA COMPLETO
+         B     CHECK
+         LA    11,1(11)
+         BCT   7,SIG_VEC
+
+* PUEDO USAR EL REGISTRO 
+CHECK    
+
+         B     FIN_PROG
+
+V_DEST   DC    C'MBPEMBP             '
+V_PESO   DC    20P'0'
+V_NUM    DC    C'0102030405060708091011121314151617181920'
+V_MARCA  DC    20C'N'
+
+CANT_REG DC    PL2'0'
+
+AUX_PACK DS    PL1
+
+DESTINOS DC    C'MBPS'
+
+AUX_NUM  DS    PL2
+SUM_PESO DS    PL2
+AUX_PESO DS    PL2
+         END
