@@ -100,10 +100,10 @@ NUEV_OBJ CLC   2(1,7),=C'N'
          BNE   SIG_OBJ
          B     COP_DEST
 RET_DES  WTO   MF=(E,M_PACK-4)
-         AP    AUX_NUM,=P'1'
          ZAP   AUX_PESO,1(1,7)
          LA    8,0
          AR    8,7
+         ZAP   C_OBJ_3,C_OBJ_1
          BAL   11,SHOW_PAQ
          MVC   2(1,7),=C'S' * LO MARCO COMO S
 ******** COMIENZA EL SEGUNDO FOR PARA OPTIMIZAR
@@ -112,26 +112,29 @@ RET_DES  WTO   MF=(E,M_PACK-4)
          LA    9,3(9)
          LA    10,0
          AR    10,6
+         ZAP   C_OBJ_2,=P'1'
 SEG_SIG  CLC   0(1,7),0(9)
          BNE   SEG_OTRO
          CLC   2(1,9),=C'N'
          BNE   SEG_OTRO
 ******** PREGUNTO SI EL PESO SUPERA LOS 8
          ZAP   SUM_PESO,AUX_PESO
-         AP    SUM_PESO,1(1,7)
+         AP    SUM_PESO,1(1,9)
          CP    SUM_PESO,=P'8'
          BH    SEG_OTRO
          LA    8,0
          AR    8,9
+         ZAP   C_OBJ_3,C_OBJ_2
          BAL   11,SHOW_PAQ
          MVC   2(1,9),=C'S'
          AP    AUX_PESO,1(1,9)
 SEG_OTRO LA    9,3(9)
-         AP    C_OBJ_1,=P'1'
+         AP    C_OBJ_2,=P'1'
          BCT   10,SEG_SIG
 ******** FINALIZA EL SEGUNDO FOR PARA OPTIMIZAR
 SIG_OBJ  LA    7,3(7)
          AP    AUX_NUM,=P'1'
+         AP    C_OBJ_1,=P'1'
          BCT   5,NUEV_OBJ
          B     FIN_PROG
          
@@ -141,10 +144,9 @@ SIG_OBJ  LA    7,3(7)
 SHOW_PAQ UNPK  PESO_C,1(1,8)
          MVZ   PESO_C,=X'FF'
          MVC   M_OBJ+17(1),PESO_C
-******** TODO: SACAR EL NUMERO DE OBJETO
-         UNPK  AUX_NPAQ,C_OBJ_1
+         UNPK  AUX_NPAQ,C_OBJ_3
          MVZ   AUX_NPAQ+1,=X'FF'
-         MVC   M_OBJ+8(1),AUX_NPAQ
+         MVC   M_OBJ+8(2),AUX_NPAQ
          WTO   MF=(E,M_OBJ-4)
          BR    11
 
@@ -226,4 +228,5 @@ AUX_NPAQ DS    CL2
 
 C_OBJ_1  DS    PL2
 C_OBJ_2  DS    PL2
+C_OBJ_3  DS    PL2
          END
