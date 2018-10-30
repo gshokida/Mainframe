@@ -1,0 +1,23 @@
+PACKS.DAT  
+
+Prueba asi no mas
+
+
+PACKS2.DAT
+8 de cada uno con 8 de peso cada uno
+
+PACKS3.DAT
+cargo 20 todos con 8 de peso
+
+
+PACKS4.DAT
+vacio
+
+PACKS5.DAT
+20 regs con 1 de peso 
+
+PACKS6.DAT
+un solo registro
+
+PACKS7.DAT 
+cargo 24 elementos solo deberia cargar 20

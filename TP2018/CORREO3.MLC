@@ -19,12 +19,20 @@
 CORREO   SUBENTRY BASES=(3,4)
          WTO   'INICIANDO LA CARGA DEL ARCHIVO'
          B     INICIAR
-FIN_INI  WTO   'LISTADO DE OBJETOS CARGADOS CORRECTAMENTE:'
+FIN_INI  WTO   '------------------------------------------------------'
+         WTO   'LISTADO DE OBJETOS CARGADOS CORRECTAMENTE:'
+         LA    7,0
+         CR    6,7
+         BE    SIN_REG
          B     MOSTRAR
+FIN_MOS  WTO   '------------------------------------------------------'
          WTO   'OPTIMIZO LOS OBJETOS EN PAQUETES:'
-FIN_MOS  B     OPTIMIZO
+         B     OPTIMIZO
 FIN_PROG WTO   'FIN'
          SUBEXIT
+
+SIN_REG  WTO   'NO HAY REGISTROS PARA LEER'
+         B     FIN_PROG
 
 **********************************************************************
 * DEFINICION DE RUTINAS O PROCEDIMIENTOS
@@ -195,7 +203,7 @@ CANT_REG DC    PL2'0'
 
 * DATOS DEL ARCHIVO
 ARCH     DCB   DSNAME=FILENAME,LRECL=2,RECFM=FB,MACRF=GM,EODAD=FINARCH
-FILENAME DC    C'C:\PACKS.DAT',X'00'
+FILENAME DC    C'C:\PACKS7.DAT',X'00'
 
 * MOSTRAR POR PANTALLA LOS OBJETOS
          DC    H'46'
