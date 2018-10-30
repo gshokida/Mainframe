@@ -109,7 +109,6 @@ RET_DES  WTO   MF=(E,M_PACK-4)
 ******** COMIENZA EL SEGUNDO FOR PARA OPTIMIZAR
          LA    9,0
          LA    9,V_OBJ
-         LA    9,3(9)
          LA    10,0
          AR    10,6
          ZAP   C_OBJ_2,=P'1'
